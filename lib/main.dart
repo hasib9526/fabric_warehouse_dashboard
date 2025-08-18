@@ -51,7 +51,7 @@ class FabricWarehouseDashboard extends StatelessWidget {
                               flex: 1,
                               child: StatsRow(),
                             ),
-                            const SizedBox(width: 16),
+                            const SizedBox(width: 10),
                             // BuyerDataTable
                             Expanded(
                               flex: 1,
@@ -61,7 +61,7 @@ class FabricWarehouseDashboard extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 10),
 
                       // Bottom Row -> Charts
                       Expanded(
@@ -151,68 +151,71 @@ class StatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Row(
-          children: [
-            Expanded(
-              child: AspectRatio(
-                aspectRatio: 2, // Width : Height ratio (adjust as needed)
-                child: StatCard(
-                  title: 'Total Warehouse capacity\n(m3)',
-                  subtitle: '(মোট ওয়ারহাউজ ক্যাপাসিটি)',
-                  value: '3,000,000',
-                  color: const Color(0xFF4ECDC4),
-                  icon: Icons.warehouse_outlined,
+    return SizedBox(
+      width: 25,
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: AspectRatio(
+                  aspectRatio: 2, // Width : Height ratio (adjust as needed)
+                  child: StatCard(
+                    title: 'Total Warehouse capacity\n(m3)',
+                    subtitle: '(মোট ওয়ারহাউজ ক্যাপাসিটি)',
+                    value: '3,000,000',
+                    color: const Color(0xFF4ECDC4),
+                    icon: Icons.warehouse_outlined,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: AspectRatio(
-                aspectRatio: 2,
-                child: StatCard(
-                  title: 'Total Quantity of Stock Aging\n(মোট স্টক এজিং পরিমাণ)',
-                  subtitle: '',
-                  value: '56,891',
-                  color: const Color(0xFFF7B731),
-                  icon: Icons.attach_money,
+              const SizedBox(width: 12),
+              Expanded(
+                child: AspectRatio(
+                  aspectRatio: 2,
+                  child: StatCard(
+                    title: 'Total Quantity of Stock Aging\n(মোট স্টক এজিং পরিমাণ)',
+                    subtitle: '',
+                    value: '56,891',
+                    color: const Color(0xFFF7B731),
+                    icon: Icons.attach_money,
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 12),
-        Row(
-          children: [
-            Expanded(
-              child: AspectRatio(
-                aspectRatio: 2,
-                child: StatCard(
-                  title: 'Total Occupied Area (m3)',
-                  subtitle: '(মোট দখলকৃত এলাকা)',
-                  value: '1,479,507',
-                  color: const Color(0xFF5CB85C),
-                  icon: Icons.warehouse_outlined,
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: AspectRatio(
+                  aspectRatio: 2,
+                  child: StatCard(
+                    title: 'Total Occupied Area (m3)',
+                    subtitle: '(মোট দখলকৃত এলাকা)',
+                    value: '1,479,507',
+                    color: const Color(0xFF5CB85C),
+                    icon: Icons.warehouse_outlined,
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: AspectRatio(
-                aspectRatio: 2,
-                child: StatCard(
-                  title: 'Total Quantity of Stock Aging\n> 1 year',
-                  subtitle: '(মোট ১ বছরের বেশি স্টক এজিং\nপরিমাণ)',
-                  value: '23,562',
-                  color: const Color(0xFF5BC0DE),
-                  icon: Icons.attach_money,
+              const SizedBox(width: 12),
+              Expanded(
+                child: AspectRatio(
+                  aspectRatio: 2,
+                  child: StatCard(
+                    title: 'Total Quantity of Stock Aging\n> 1 year',
+                    subtitle: '(মোট ১ বছরের বেশি স্টক এজিং\nপরিমাণ)',
+                    value: '23,562',
+                    color: const Color(0xFF5BC0DE),
+                    icon: Icons.attach_money,
+                  ),
                 ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -302,6 +305,8 @@ class StatCard extends StatelessWidget {
 }
 
 class BuyerDataTable extends StatelessWidget {
+  const BuyerDataTable({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -464,6 +469,8 @@ class CapacityChart extends StatelessWidget {
 }
 
 class StockAgingChart extends StatelessWidget {
+  const StockAgingChart({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -501,7 +508,7 @@ class StockAgingChart extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildLegend(const Color(0xFFD9534F), '0 - 11 Months'),
-                  const SizedBox(width: 8),
+
                   _buildLegend(const Color(0xFFF0AD4E), '> 11 Months - 2 Years'),
                   _buildLegend(const Color(0xFF9B59B6), '> 2 Years - 3 Years'),
                 ],
@@ -535,6 +542,8 @@ class StockAgingChart extends StatelessWidget {
 }
 
 class BuyerWiseChart extends StatelessWidget {
+  const BuyerWiseChart({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -559,9 +568,9 @@ class BuyerWiseChart extends StatelessWidget {
                 size: const Size(200, 200),
                 painter: DonutChartPainter([
                   ChartData('Decathlon', 25.3, const Color(0xFF3498DB)),
-                  ChartData('Benetton', 65.0, const Color(0xFFD9534F)),
-                  ChartData('H&M', 5.0, const Color(0xFFF0AD4E)),
-                  ChartData('RL', 4.7, const Color(0xFF5CB85C)),
+                  ChartData('Benetton', 55.0, const Color(0xFFD9534F)),
+                  ChartData('H&M', 10.0, const Color(0xFFF0AD4E)),
+                  ChartData('RL', 20.7, const Color(0xFF5CB85C)),
                 ]),
               ),
             ),
@@ -624,8 +633,8 @@ class DonutChartPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = math.min(size.width, size.height) / 2.5;
-    final innerRadius = radius * 0.6;
+    final radius = math.min(size.width, size.height) / 2.0;
+    final innerRadius = radius * 0.4;
 
     double startAngle = -math.pi / 2;
     final total = data.fold(0.0, (sum, item) => sum + item.value);
