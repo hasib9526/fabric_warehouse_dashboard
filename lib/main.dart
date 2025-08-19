@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -207,7 +208,8 @@ class StatsRow extends StatelessWidget {
                     title: 'Total Quantity of Stock Aging\n> 1 year',
                     subtitle: '(মোট ১ বছরের বেশি স্টক এজিং\nপরিমাণ)',
                     value: '23,562',
-                    color: const Color(0xFF5BC0DE),
+                    // color: const Color(0xFF5BC0DE),
+                    color: Colors.red,
                     icon: Icons.attach_money,
                   ),
                 ),
@@ -276,7 +278,7 @@ class StatCard extends StatelessWidget {
                   subtitle,
                   style: const TextStyle(
                     fontSize: 10,
-                    color: Colors.white70,
+                    color: Colors.white,
                   ),
                 ),
               ],
@@ -304,13 +306,103 @@ class StatCard extends StatelessWidget {
   }
 }
 
-class BuyerDataTable extends StatelessWidget {
+
+class BuyerDataTable extends StatefulWidget {
   const BuyerDataTable({super.key});
 
   @override
+  State<BuyerDataTable> createState() => _BuyerDataTableState();
+}
+
+class _BuyerDataTableState extends State<BuyerDataTable> {
+  // Simulated backend data
+  final List<Map<String, String>> _buyerData = [
+    {
+      'buyer': 'Ralph Lauren',
+      'total': '373,940',
+      'year1': '230120 (61.54%)',
+      'year2': '120310 (32.17%)',
+      'year3': '23510 (6.28%)',
+    },
+    {
+      'buyer': 'Benetton ',
+      'total': '962,220',
+      'year1': '3412 (0.35%)',
+      'year2': '891267 (92.63%)',
+      'year3': '67541 (7.02%)',
+    },
+    {
+      'buyer': 'H&M',
+      'total': '74,437',
+      'year1': '1290 (1.73%)',
+      'year2': '31908 (42.87%)',
+      'year3': '41239 (55.40%)',
+    },
+    {
+      'buyer': 'RL',
+      'total': '68,910',
+      'year1': '34690 (50.34%)',
+      'year2': '21908 (31.79%)',
+      'year3': '12312 (17.87%)',
+    },
+    {
+      'buyer': 'Nike',
+      'total': '120,500',
+      'year1': '80500 (66.80%)',
+      'year2': '30000 (24.90%)',
+      'year3': '10000 (8.30%)',
+    },
+    {
+      'buyer': 'Adidas',
+      'total': '95,780',
+      'year1': '45780 (47.80%)',
+      'year2': '40000 (41.76%)',
+      'year3': '10000 (10.44%)',
+    },
+    {
+      'buyer': 'Puma',
+      'total': '82,340',
+      'year1': '52340 (63.56%)',
+      'year2': '25000 (30.36%)',
+      'year3': '5000 (6.08%)',
+    },
+  ];
+
+  final int _rowsPerPage = 6;
+  int _currentPage = 0;
+  late Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set up timer for auto pagination
+    _timer = Timer.periodic(const Duration(seconds: 10), (timer) {
+      if (mounted) {
+        setState(() {
+          _currentPage = (_currentPage + 1) % ((_buyerData.length / _rowsPerPage).ceil());
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // Calculate the current page data
+    final startIndex = _currentPage * _rowsPerPage;
+    var endIndex = startIndex + _rowsPerPage;
+    if (endIndex > _buyerData.length) {
+      endIndex = _buyerData.length;
+    }
+    final currentPageData = _buyerData.sublist(startIndex, endIndex);
+
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
         color: const Color(0xFF9BCF7F),
         border: Border.all(color: Colors.black, width: 1),
@@ -318,29 +410,33 @@ class BuyerDataTable extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Buyer Wise Fabric Data with Aging',
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+          Center(
+            child: Text(
+              'Buyer Wise Fabric Data with Aging',
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
             ),
           ),
-          Text(
-            'বায়ার অনুযায়ী ফ্যাব্রিক ডাটা ও এজিং',
-            style: const TextStyle(
-              fontSize: 12,
-              color: Colors.black,
-            ),
-          ),
-          const SizedBox(height: 16),
+          // Center(
+          //   child: Text(
+          //     'বায়ার অনুযায়ী ফ্যাব্রিক ডাটা ও এজিং',
+          //     style: const TextStyle(
+          //       fontSize: 12,
+          //       color: Colors.black,
+          //     ),
+          //   ),
+          // ),
+          const SizedBox(height: 4),
           Expanded(
             child: SingleChildScrollView(
               child: Table(
                 border: TableBorder.all(color: Colors.black, width: 1),
                 columnWidths: const {
-                  0: FlexColumnWidth(1.5),
-                  1: FlexColumnWidth(1.5),
+                  0: FlexColumnWidth(1.6),
+                  1: FlexColumnWidth(1.7),
                   2: FlexColumnWidth(2),
                   3: FlexColumnWidth(2),
                   4: FlexColumnWidth(2),
@@ -350,19 +446,47 @@ class BuyerDataTable extends StatelessWidget {
                   TableRow(
                     decoration: BoxDecoration(color: Colors.white),
                     children: [
-                      _buildTableCell('Buyer Name\nবায়ার নাম', isHeader: true),
-                      _buildTableCell('Total Volume (yard)\nমোট আয়তন (গজ)', isHeader: true),
-                      _buildTableCell('< 1 Year\n১ বছরের কম', isHeader: true),
-                      _buildTableCell('1 Year < to > 2 Years\n১ বছরের বেশি ২ বছরের কম', isHeader: true),
-                      _buildTableCell('2 Years < to > 3 Years\n২ বছরের বেশি ৩ বছরের কম', isHeader: true),
+                      _buildTableCell('Buyer Name', isHeader: true),
+                      // _buildTableCell('Buyer Name\nবায়ার নাম', isHeader: true),
+                      _buildTableCell('Total Volume (yard)', isHeader: true),
+                      // _buildTableCell('Total Volume (yard) মোট আয়তন (গজ)', isHeader: true),
+                      _buildTableCell('< 1 Year', isHeader: true, textColor: Colors.white, backgroundColor: Colors.green),
+                      // _buildTableCell('< 1 Year\n১ বছরের কম', isHeader: true),
+                      _buildTableCell('1 Year < to > 2 Years', isHeader: true, textColor: Colors.white, backgroundColor: Colors.orange),
+                      // _buildTableCell('1 Year < to > 2 Years\n১ বছরের বেশি ২ বছরের কম', isHeader: true),
+                      _buildTableCell('2 Years < to > 3 Years', isHeader: true, textColor: Colors.white, backgroundColor: Colors.red),
+                      // _buildTableCell('2 Years < to > 3 Years\n২ বছরের বেশি ৩ বছরের কম', isHeader: true),
                     ],
                   ),
-                  // Data rows
-                  _buildDataRow('Decathlon', '373,940', '230120 (61.54%)', '120310 (32.17%)', '23510 (6.28%)'),
-                  _buildDataRow('Benetton', '962,220', '3412 (0.35%)', '891267 (92.63%)', '67541 (7.02%)'),
-                  _buildDataRow('H&M', '74,437', '1290 (1.73%)', '31908 (42.87%)', '41239 (55.40%)'),
-                  _buildDataRow('RL', '68,910', '34690 (50.34%)', '21908 (31.79%)', '12312 (17.87%)'),
+                  // Data rows from current page
+                  ...currentPageData.map((data) => _buildDataRow(
+                    data['buyer']!,
+                    data['total']!,
+                    data['year1']!,
+                    data['year2']!,
+                    data['year3']!,
+                  )).toList(),
                 ],
+              ),
+            ),
+          ),
+          // Page indicator
+          Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: List.generate(
+                (_buyerData.length / _rowsPerPage).ceil(),
+                    (index) => Padding(
+                  padding: const EdgeInsets.all(4.0),
+                  child: Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: _currentPage == index ? Colors.black : Colors.grey,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -384,17 +508,19 @@ class BuyerDataTable extends StatelessWidget {
     );
   }
 
-  Widget _buildTableCell(String text, {bool isHeader = false}) {
+  Widget _buildTableCell(String text, {bool isHeader = false, Color? textColor, Color? backgroundColor}) {
     return Container(
-      padding: const EdgeInsets.all(8),
+      padding: const EdgeInsets.all(6),
+      decoration: backgroundColor != null ? BoxDecoration(color: backgroundColor) : null,
       child: Text(
         text,
         style: TextStyle(
-          fontSize: isHeader ? 10 : 9,
+          fontSize: isHeader ? 12 : 11,
           fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-          color: Colors.black,
+          color: textColor ?? Colors.black,
         ),
         textAlign: TextAlign.center,
+        maxLines: 1,
       ),
     );
   }
@@ -436,9 +562,10 @@ class CapacityChart extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               _buildLegend(const Color(0xFF5CB85C), 'Total capacity (m3)'),
-              const SizedBox(width: 16),
+
               _buildLegend(const Color(0xFFD9534F), 'Occupied Area (m3)'),
             ],
           ),
@@ -461,7 +588,7 @@ class CapacityChart extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           text,
-          style: const TextStyle(fontSize: 10),
+          style: const TextStyle(fontSize: 12),
         ),
       ],
     );
@@ -510,6 +637,12 @@ class StockAgingChart extends StatelessWidget {
                   _buildLegend(const Color(0xFFD9534F), '0 - 11 Months'),
 
                   _buildLegend(const Color(0xFFF0AD4E), '> 11 Months - 2 Years'),
+
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   _buildLegend(const Color(0xFF9B59B6), '> 2 Years - 3 Years'),
                 ],
               ),
@@ -534,7 +667,7 @@ class StockAgingChart extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           text,
-          style: const TextStyle(fontSize: 9),
+          style: const TextStyle(fontSize: 12),
         ),
       ],
     );
@@ -610,7 +743,7 @@ class BuyerWiseChart extends StatelessWidget {
         const SizedBox(width: 4),
         Text(
           text,
-          style: const TextStyle(fontSize: 10),
+          style: const TextStyle(fontSize: 12),
         ),
       ],
     );
@@ -676,7 +809,7 @@ class DonutChartPainter extends CustomPainter {
           text: TextSpan(
             text: '$percentage%',
             style: TextStyle(
-              color: Colors.black,
+              color: Colors.white,
               fontSize: 12,
               fontWeight: FontWeight.bold,
               shadows: [
