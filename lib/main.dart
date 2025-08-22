@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+
+import 'package:fabric_warehouse_dashboard/view/widgets/desh_board_header.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -34,12 +36,9 @@ class FabricWarehouseDashboard extends StatelessWidget {
             children: [
               // Header
               const DashboardHeader(),
-
-              // Main Content
-              // Main Content
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(10.0),
                   child: Column(
                     children: [
                       // Top Row -> Stats + BuyerDataTable
@@ -62,8 +61,8 @@ class FabricWarehouseDashboard extends StatelessWidget {
                         ),
                       ),
 
-                      const SizedBox(height: 10),
-
+                      // const SizedBox(height: 10),
+                      SizedBox(height: MediaQuery.of(context).size.height*0.02 ,),
                       // Bottom Row -> Charts
                       Expanded(
                         flex: 1,
@@ -91,61 +90,7 @@ class FabricWarehouseDashboard extends StatelessWidget {
   }
 }
 
-class DashboardHeader extends StatelessWidget {
-  const DashboardHeader({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 0),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade300,
-        border: const Border(
-          bottom: BorderSide(color: Colors.black, width: 1),
-        ),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Fabric Warehouse Dashboard',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                  letterSpacing: 1.0,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'ফ্যাব্রিক ওয়ারহাউজ ড্যাশবোর্ড',
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
-                ),
-              ),
-            ],
-          ),
-          Text(
-            'তারিখ : 12.08.2025',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              color: Colors.black,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class StatsRow extends StatelessWidget {
   const StatsRow({super.key});
@@ -306,7 +251,6 @@ class StatCard extends StatelessWidget {
   }
 }
 
-
 class BuyerDataTable extends StatefulWidget {
   const BuyerDataTable({super.key});
 
@@ -318,7 +262,7 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
   // Simulated backend data
   final List<Map<String, String>> _buyerData = [
     {
-      'buyer': 'Ralph Lauren',
+      'buyer': 'Ralph Lauren Ralph Lauren',
       'total': '373,940',
       'year1': '230120 (61.54%)',
       'year2': '120310 (32.17%)',
@@ -368,7 +312,7 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
     },
   ];
 
-  final int _rowsPerPage = 6;
+  final int _rowsPerPage = 5;
   int _currentPage = 0;
   late Timer _timer;
 
@@ -420,20 +364,37 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
               ),
             ),
           ),
-          // Center(
-          //   child: Text(
-          //     'বায়ার অনুযায়ী ফ্যাব্রিক ডাটা ও এজিং',
-          //     style: const TextStyle(
-          //       fontSize: 12,
-          //       color: Colors.black,
-          //     ),
-          //   ),
-          // ),
           const SizedBox(height: 4),
+
+          // Header Table (Separate)
+          Table(
+            border: TableBorder.all(color: Colors.black, width: 0.5),
+            columnWidths: const {
+              0: FlexColumnWidth(1.6),
+              1: FlexColumnWidth(1.7),
+              2: FlexColumnWidth(2),
+              3: FlexColumnWidth(2),
+              4: FlexColumnWidth(2),
+            },
+            children: [
+              TableRow(
+                decoration: BoxDecoration(color: Colors.white),
+                children: [
+                  _buildHeaderCell('Buyer Name'),
+                  _buildHeaderCell('Total Volume (yard)'),
+                  _buildHeaderCell('< 1 Year', textColor: Colors.white, backgroundColor: Colors.green),
+                  _buildHeaderCell('1 Year < to > 2 Years', textColor: Colors.white, backgroundColor: Colors.orange),
+                  _buildHeaderCell('2 Years < to > 3 Years', textColor: Colors.white, backgroundColor: Colors.red),
+                ],
+              ),
+            ],
+          ),
+
+          // Data Table (Separate)
           Expanded(
             child: SingleChildScrollView(
               child: Table(
-                border: TableBorder.all(color: Colors.black, width: 1),
+                border: TableBorder.all(color: Colors.black, width: 0.5),
                 columnWidths: const {
                   0: FlexColumnWidth(1.6),
                   1: FlexColumnWidth(1.7),
@@ -442,22 +403,6 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
                   4: FlexColumnWidth(2),
                 },
                 children: [
-                  // Header
-                  TableRow(
-                    decoration: BoxDecoration(color: Colors.white),
-                    children: [
-                      _buildTableCell('Buyer Name', isHeader: true),
-                      // _buildTableCell('Buyer Name\nবায়ার নাম', isHeader: true),
-                      _buildTableCell('Total Volume (yard)', isHeader: true),
-                      // _buildTableCell('Total Volume (yard) মোট আয়তন (গজ)', isHeader: true),
-                      _buildTableCell('< 1 Year', isHeader: true, textColor: Colors.white, backgroundColor: Colors.green),
-                      // _buildTableCell('< 1 Year\n১ বছরের কম', isHeader: true),
-                      _buildTableCell('1 Year < to > 2 Years', isHeader: true, textColor: Colors.white, backgroundColor: Colors.orange),
-                      // _buildTableCell('1 Year < to > 2 Years\n১ বছরের বেশি ২ বছরের কম', isHeader: true),
-                      _buildTableCell('2 Years < to > 3 Years', isHeader: true, textColor: Colors.white, backgroundColor: Colors.red),
-                      // _buildTableCell('2 Years < to > 3 Years\n২ বছরের বেশি ৩ বছরের কম', isHeader: true),
-                    ],
-                  ),
                   // Data rows from current page
                   ...currentPageData.map((data) => _buildDataRow(
                     data['buyer']!,
@@ -470,6 +415,7 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
               ),
             ),
           ),
+
           // Page indicator
           Center(
             child: Row(
@@ -499,34 +445,57 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
     return TableRow(
       decoration: BoxDecoration(color: Colors.white),
       children: [
-        _buildTableCell(buyer),
-        _buildTableCell(total),
-        _buildTableCell(year1),
-        _buildTableCell(year2),
-        _buildTableCell(year3),
+        _buildDataCell(buyer),
+        _buildDataCell(total),
+        _buildDataCell(year1),
+        _buildDataCell(year2),
+        _buildDataCell(year3),
       ],
     );
   }
 
-  Widget _buildTableCell(String text, {bool isHeader = false, Color? textColor, Color? backgroundColor}) {
+  // Separate Header Cell Widget
+  Widget _buildHeaderCell(String text, {Color? textColor, Color? backgroundColor}) {
     return Container(
-      padding: const EdgeInsets.all(6),
+      height: MediaQuery.of(context).size.height * 0.06,
+      padding: const EdgeInsets.all(1),
       decoration: backgroundColor != null ? BoxDecoration(color: backgroundColor) : null,
-      child: Text(
-        text,
-        style: TextStyle(
-          fontSize: isHeader ? 12 : 11,
-          fontWeight: isHeader ? FontWeight.bold : FontWeight.normal,
-          color: textColor ?? Colors.black,
+      child: Center(
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: textColor ?? Colors.black,
+          ),
+          textAlign: TextAlign.center,
+          maxLines: 2,
         ),
-        textAlign: TextAlign.center,
-        maxLines: 1,
+      ),
+    );
+  }
+
+  // Separate Data Cell Widget
+  Widget _buildDataCell(String text) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.055,
+      padding: const EdgeInsets.all(1),
+      decoration: BoxDecoration(color: Colors.white),
+      child: Center(
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.normal,
+            color: Colors.black,
+          ),
+          textAlign: TextAlign.center,
+          maxLines: 2,
+        ),
       ),
     );
   }
 }
-
-
 
 class CapacityChart extends StatelessWidget {
   const CapacityChart({super.key});
@@ -534,7 +503,7 @@ class CapacityChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black, width: 1),
       ),
@@ -542,13 +511,13 @@ class CapacityChart extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Capacity vs Occupation (ক্যাপাসিটি VS\nঅকুপেশন)',
+            'Capacity vs Occupation (ক্যাপাসিটি VS অকুপেশন)',
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 16),
+          // const SizedBox(height: 10),
           Expanded(
             child: Center(
               child: CustomPaint(
@@ -601,7 +570,8 @@ class StockAgingChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black, width: 1),
       ),
@@ -611,11 +581,11 @@ class StockAgingChart extends StatelessWidget {
           Text(
             'Stock Aging % (স্টক এজিং)',
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 16),
+          // const SizedBox(height: 16),
           Expanded(
             child: Center(
               child: CustomPaint(
@@ -680,7 +650,7 @@ class BuyerWiseChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         border: Border.all(color: Colors.black, width: 1),
       ),
@@ -688,13 +658,13 @@ class BuyerWiseChart extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Occupied % (Buyer Wise) অকুপাইড % বায়ার\nওয়াইজ',
+            'Occupied % (Buyer Wise) অকুপাইড % বায়ার ওয়াইজ',
             style: const TextStyle(
-              fontSize: 14,
+              fontSize: 12,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 16),
+          // const SizedBox(height: 16),
           Expanded(
             child: Center(
               child: CustomPaint(

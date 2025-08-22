@@ -1,0 +1,48 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+    <!-- Background -->
+    <rect width="1024" height="1024" fill="#4ECDC4" rx="180"/>
+
+    <!-- Warehouse Building -->
+    <path d="M150 750 L150 400 L512 250 L874 400 L874 750 Z" fill="#2C3E50" stroke="#1A252F" stroke-width="8"/>
+
+    <!-- Warehouse Roof -->
+    <path d="M100 400 L512 200 L924 400 L874 380 L512 250 L150 380 Z" fill="#34495E"/>
+
+    <!-- Main Door -->
+    <rect x="450" y="600" width="124" height="150" fill="#E74C3C" rx="8"/>
+    <rect x="470" y="620" width="84" height="110" fill="#C0392B"/>
+
+    <!-- Windows -->
+    <rect x="200" y="450" width="80" height="60" fill="#F39C12" rx="8"/>
+    <rect x="320" y="450" width="80" height="60" fill="#F39C12" rx="8"/>
+    <rect x="624" y="450" width="80" height="60" fill="#F39C12" rx="8"/>
+    <rect x="744" y="450" width="80" height="60" fill="#F39C12" rx="8"/>
+
+    <!-- Fabric Rolls -->
+    <circle cx="220" cy="650" r="35" fill="#E67E22" stroke="#D35400" stroke-width="4"/>
+    <circle cx="300" cy="650" r="35" fill="#9B59B6" stroke="#8E44AD" stroke-width="4"/>
+    <circle cx="380" cy="650" r="35" fill="#E74C3C" stroke="#C0392B" stroke-width="4"/>
+
+    <circle cx="644" cy="650" r="35" fill="#27AE60" stroke="#229954" stroke-width="4"/>
+    <circle cx="724" cy="650" r="35" fill="#3498DB" stroke="#2980B9" stroke-width="4"/>
+    <circle cx="804" cy="650" r="35" fill="#F1C40F" stroke="#F39C12" stroke-width="4"/>
+
+    <!-- Fabric Roll Details -->
+    <rect x="200" y="640" width="40" height="20" fill="#D35400" opacity="0.7"/>
+    <rect x="280" y="640" width="40" height="20" fill="#8E44AD" opacity="0.7"/>
+    <rect x="360" y="640" width="40" height="20" fill="#C0392B" opacity="0.7"/>
+    <rect x="624" y="640" width="40" height="20" fill="#229954" opacity="0.7"/>
+    <rect x="704" y="640" width="40" height="20" fill="#2980B9" opacity="0.7"/>
+    <rect x="784" y="640" width="40" height="20" fill="#F39C12" opacity="0.7"/>
+
+    <!-- Dashboard Elements -->
+    <rect x="450" y="350" width="124" height="80" fill="#FFFFFF" rx="8" opacity="0.9"/>
+    <rect x="460" y="370" width="30" height="20" fill="#5CB85C"/>
+    <rect x="500" y="370" width="30" height="20" fill="#F0AD4E"/>
+    <rect x="540" y="370" width="30" height="20" fill="#D9534F"/>
+    <circle cx="512" cy="400" r="15" fill="#4ECDC4"/>
+
+    <!-- Company Name Area -->
+    <rect x="200" y="820" width="624" height="80" fill="#2C3E50" rx="20" opacity="0.8"/>
+    <text x="512" y="870" text-anchor="middle" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="36" font-weight="bold">FABRIC WAREHOUSE</text>
+</svg>
