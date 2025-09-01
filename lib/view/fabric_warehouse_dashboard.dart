@@ -597,7 +597,7 @@ class CapacityChart extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          // const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -703,7 +703,7 @@ class StockAgingChart extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 8),
+            // const SizedBox(height: 8),
             Column(
               children: [
                 Row(
@@ -904,7 +904,7 @@ class DonutChartPainter extends CustomPainter {
       canvas.drawPath(path, paint);
 
       // Draw percentage text on the arc (only if segment is large enough)
-      if (sweepAngle > 0.3) {
+      if (sweepAngle > 0.1) {
         // Only show text for segments larger than ~17 degrees
         final textAngle = startAngle + sweepAngle / 2;
         final textRadius = (radius + innerRadius) / 2;

@@ -65,7 +65,7 @@ class DashboardHeader extends StatelessWidget {
                   ),
                 ),
                 Text(
-                  'তারিখ : $currentDate',
+                  'Date : $currentDate',
                   style: const TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
