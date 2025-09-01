@@ -37,6 +37,7 @@ dependencies:
   get:
   http:
   intl:
+  marquee:
 
 
 dev_dependencies:
