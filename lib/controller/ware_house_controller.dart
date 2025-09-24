@@ -13,11 +13,11 @@ class FabricWarehouseController extends GetxController {
   var errorMessage = ''.obs;
   var hasConnectionError = false.obs;
 
-  //TAL
-  //   var companyId = '06'.obs;
+  // TAL
+    var companyId = '06'.obs;
 
-  //BGL
-  var companyId = '04'.obs;
+  // //BGL
+  // var companyId = '04'.obs;
 
   @override
   void onInit() {

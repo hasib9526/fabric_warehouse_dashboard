@@ -1,305 +1,338 @@
-// import 'dart:math' as math;
-//
-// import 'package:flutter/cupertino.dart';
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-// import 'package:get/get_core/src/get_main.dart';
-//
-// import '../../controller/ware_house_controller.dart';
-// import '../../model/fabric_warehouse.dart';
-//
-// class BuyerWiseChart extends StatelessWidget {
-//   const BuyerWiseChart({super.key});
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     final FabricWarehouseController controller = Get.find<FabricWarehouseController>();
-//
-//     return Obx(() {
-//       if (controller.isLoading.value) {
-//         return Center(child: CircularProgressIndicator());
-//       }
-//
-//       if (controller.errorMessage.value.isNotEmpty) {
-//         return Center(child: Text('Error loading data'));
-//       }
-//
-//       final warehouseList = controller.fabricWarehouse.value.warehouseList;
-//       final totalStockAging = controller.fabricWarehouse.value.tQtyStockAging ?? 1;
-//
-//       if (warehouseList == null || warehouseList.isEmpty) {
-//         return Container(
-//           padding: const EdgeInsets.all(10),
-//           decoration: BoxDecoration(
-//             border: Border.all(color: Colors.black, width: 1),
-//           ),
-//           child: Center(child: Text('No data available')),
-//         );
-//       }
-//
-//       // Generate colors for all buyers
-//       final List<Color> baseColors = [
-//         const Color(0xFF3498DB), // Blue
-//         Colors.red, // Red
-//         const Color(0xFFF7B731), // Yellow
-//         const Color(0xFF5CB85C), // Green
-//         const Color(0xFF9B59B6), // Purple
-//         const Color(0xFFE67E22), // Orange
-//         const Color(0xFF34495E), // Dark blue
-//         const Color(0xFF1ABC9C), // Teal
-//         const Color(0xFFFF6B6B), // Light red
-//         const Color(0xFF4ECDC4), // Cyan
-//         const Color(0xFF45B7D1), // Sky blue
-//         const Color(0xFF96CEB4), // Mint green
-//         const Color(0xFFFECA57), // Golden yellow
-//         const Color(0xFFFF9FF3), // Pink
-//         const Color(0xFF54A0FF), // Bright blue
-//         const Color(0xFF5F27CD), // Deep purple
-//       ];
-//
-//       // Calculate percentage for each buyer
-//       final List<ChartData> chartData = [];
-//
-//       // Sort buyers by total volume (descending)
-//       final sortedBuyers = List<WarehouseList>.from(warehouseList);
-//       sortedBuyers.sort((a, b) => (b.total3Years ?? 0).compareTo(a.total3Years ?? 0));
-//
-//       // Show ALL buyers - no limit
-//       for (int i = 0; i < sortedBuyers.length; i++) {
-//         final buyer = sortedBuyers[i];
-//         final totalVolume = buyer.total3Years ?? 0;
-//
-//         // Skip buyers with 0 volume
-//         if (totalVolume == 0) continue;
-//
-//         final percentage = (totalVolume / totalStockAging) * 100;
-//
-//         // Generate color (cycle through base colors and create variations)
-//         Color color;
-//         if (i < baseColors.length) {
-//           color = baseColors[i];
-//         } else {
-//           // Create color variations for buyers beyond base colors
-//           final baseColorIndex = i % baseColors.length;
-//           final baseColor = baseColors[baseColorIndex];
-//           final variation = (i / baseColors.length).floor();
-//
-//           // Create lighter/darker variations
-//           switch (variation % 3) {
-//             case 1:
-//               color = _lightenColor(baseColor, 0.3);
-//               break;
-//             case 2:
-//               color = _darkenColor(baseColor, 0.3);
-//               break;
-//             default:
-//               color = baseColor;
-//           }
-//         }
-//
-//         chartData.add(ChartData(
-//           _formatBuyerName(buyer.buyer ?? 'Unknown'),
-//           percentage,
-//           color,
-//         ));
-//       }
-//
-//       return Container(
-//         padding: const EdgeInsets.all(10),
-//         decoration: BoxDecoration(
-//           border: Border.all(color: Colors.black, width: 1),
-//         ),
-//         child: Column(
-//           crossAxisAlignment: CrossAxisAlignment.start,
-//           children: [
-//             Text(
-//               'Occupied % (Buyer Wise) অকুপাইড % বায়ার ওয়াইজ',
-//               style: const TextStyle(
-//                 fontSize: 12,
-//                 fontWeight: FontWeight.bold,
-//               ),
-//             ),
-//             Expanded(
-//               child: Row(
-//                 children: [
-//                   // Chart on the left
-//                   Expanded(
-//                     flex: 1,
-//                     child: Center(
-//                       child: CustomPaint(
-//                         size: Size(
-//                           MediaQuery.of(context).size.width * 0.15,
-//                           MediaQuery.of(context).size.width * 0.15,
-//                         ),
-//                         painter: DonutChartPainter(chartData),
-//                       ),
-//                     ),
-//                   ),
-//                   const SizedBox(width: 10),
-//                   // Legend on the right
-//                   Expanded(
-//                     flex: 1,
-//                     child: SingleChildScrollView(
-//                       child: _buildLegend(chartData),
-//                     ),
-//                   ),
-//                 ],
-//               ),
-//             ),
-//           ],
-//         ),
-//       );
-//     });
-//   }
-//
-//   // Format buyer name to show like "Decathlon (22.4%)"
-//   String _formatBuyerName(String name) {
-//     // Shorten long names for better display
-//     if (name.length > 20) {
-//       return name.substring(0, 17) + "...";
-//     }
-//     return name;
-//   }
-//
-//   Widget _buildLegend(List<ChartData> chartData) {
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: chartData.map((data) =>
-//           Padding(
-//             padding: const EdgeInsets.only(bottom: 4.0),
-//             child: _buildLegendItem(
-//               data.color,
-//               '${data.label} (${data.value.toStringAsFixed(1)}%)',
-//             ),
-//           ),
-//       ).toList(),
-//     );
-//   }
-//
-//   Widget _buildLegendItem(Color color, String text) {
-//     return Row(
-//       mainAxisSize: MainAxisSize.min,
-//       crossAxisAlignment: CrossAxisAlignment.center,
-//       children: [
-//         Container(
-//           width: 12,
-//           height: 12,
-//           decoration: BoxDecoration(
-//             color: color,
-//             shape: BoxShape.circle,
-//           ),
-//         ),
-//         const SizedBox(width: 6),
-//         Expanded(
-//           child: Text(
-//             text,
-//             style: const TextStyle(
-//               fontSize: 10,
-//               fontWeight: FontWeight.w500,
-//             ),
-//             overflow: TextOverflow.ellipsis,
-//             maxLines: 2,
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-//
-//   // Helper method to lighten a color
-//   Color _lightenColor(Color color, double amount) {
-//     final hsl = HSLColor.fromColor(color);
-//     final lightness = math.min(1.0, hsl.lightness + amount);
-//     return hsl.withLightness(lightness).toColor();
-//   }
-//
-//   // Helper method to darken a color
-//   Color _darkenColor(Color color, double amount) {
-//     final hsl = HSLColor.fromColor(color);
-//     final lightness = math.max(0.0, hsl.lightness - amount);
-//     return hsl.withLightness(lightness).toColor();
-//   }
-// }
-//
-// // Chart data class
-// class ChartData {
-//   final String label;
-//   final double value;
-//   final Color color;
-//
-//   ChartData(this.label, this.value, this.color);
-// }
-//
-// // Custom painter for donut chart
-// class DonutChartPainter extends CustomPainter {
-//   final List<ChartData> data;
-//
-//   DonutChartPainter(this.data);
-//
-//   @override
-//   void paint(Canvas canvas, Size size) {
-//     final center = Offset(size.width / 2, size.height / 2);
-//     final radius = math.min(size.width, size.height) / 2;
-//     final innerRadius = radius * 0.6; // Creates donut effect
-//
-//     double startAngle = -math.pi / 2; // Start from top
-//     final total = data.fold<double>(0, (sum, item) => sum + item.value);
-//
-//     for (final item in data) {
-//       final sweepAngle = (item.value / total) * 2 * math.pi;
-//
-//       // Draw outer arc
-//       final paint = Paint()
-//         ..color = item.color
-//         ..style = PaintingStyle.fill;
-//
-//       final path = Path();
-//
-//       // Calculate start and end points for outer arc
-//       final outerStartX = center.dx + radius * math.cos(startAngle);
-//       final outerStartY = center.dy + radius * math.sin(startAngle);
-//       final outerEndX = center.dx + radius * math.cos(startAngle + sweepAngle);
-//       final outerEndY = center.dy + radius * math.sin(startAngle + sweepAngle);
-//
-//       // Calculate start and end points for inner arc
-//       final innerStartX = center.dx + innerRadius * math.cos(startAngle);
-//       final innerStartY = center.dy + innerRadius * math.sin(startAngle);
-//       final innerEndX = center.dx + innerRadius * math.cos(startAngle + sweepAngle);
-//       final innerEndY = center.dy + innerRadius * math.sin(startAngle + sweepAngle);
-//
-//       // Create donut segment path
-//       path.moveTo(outerStartX, outerStartY);
-//       path.arcTo(
-//         Rect.fromCircle(center: center, radius: radius),
-//         startAngle,
-//         sweepAngle,
-//         false,
-//       );
-//       path.lineTo(innerEndX, innerEndY);
-//       path.arcTo(
-//         Rect.fromCircle(center: center, radius: innerRadius),
-//         startAngle + sweepAngle,
-//         -sweepAngle,
-//         false,
-//       );
-//       path.close();
-//
-//       canvas.drawPath(path, paint);
-//
-//       startAngle += sweepAngle;
-//     }
-//
-//     // Draw border around the donut
-//     final borderPaint = Paint()
-//       ..color = Colors.black
-//       ..style = PaintingStyle.stroke
-//       ..strokeWidth = 1.0;
-//
-//     canvas.drawCircle(center, radius, borderPaint);
-//     canvas.drawCircle(center, innerRadius, borderPaint);
-//   }
-//
-//   @override
-//   bool shouldRepaint(covariant CustomPainter oldDelegate) {
-//     return true;
-//   }
-// }
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+
+import '../../controller/ware_house_controller.dart';
+
+class BuyerDataTable extends StatefulWidget {
+  const BuyerDataTable({super.key});
+
+  @override
+  State<BuyerDataTable> createState() => _BuyerDataTableState();
+}
+
+class _BuyerDataTableState extends State<BuyerDataTable> {
+  final int _rowsPerPage = 5;
+  int _currentPage = 0;
+  late Timer _timer;
+  final FabricWarehouseController controller =
+  Get.find<FabricWarehouseController>();
+
+  @override
+  void initState() {
+    super.initState();
+    // Set up timer for auto pagination
+    _timer = Timer.periodic(const Duration(seconds: 20), (timer) {
+      if (mounted && controller.fabricWarehouse.value.warehouseList != null) {
+        setState(() {
+          final totalPages =
+          ((controller.fabricWarehouse.value.warehouseList!.length) /
+              _rowsPerPage)
+              .ceil();
+          _currentPage =
+              (_currentPage + 1) % (totalPages == 0 ? 1 : totalPages);
+        });
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return Center(child: CircularProgressIndicator());
+      }
+
+      if (controller.errorMessage.value.isNotEmpty) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text('Error: ${controller.errorMessage.value}'),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () => controller.fetchFabricWarehouseData(),
+                child: Text('Retry'),
+              ),
+            ],
+          ),
+        );
+      }
+
+      final warehouseList = controller.fabricWarehouse.value.warehouseList;
+
+      if (warehouseList == null || warehouseList.isEmpty) {
+        return Center(child: Text('No data available'));
+      }
+
+      // Calculate totals
+      int totalVolume = 0;
+      int totalYear1 = 0;
+      int totalYear2 = 0;
+      int totalYear3 = 0;
+
+      for (var data in warehouseList) {
+        totalVolume += data.total3Years ?? 0;
+        totalYear1 += data.year1 ?? 0;
+        totalYear2 += data.year2 ?? 0;
+        totalYear3 += data.year3 ?? 0;
+      }
+
+      // Calculate the current page data
+      final startIndex = _currentPage * _rowsPerPage;
+      var endIndex = startIndex + _rowsPerPage;
+      if (endIndex > warehouseList.length) {
+        endIndex = warehouseList.length;
+      }
+      final currentPageData = warehouseList.sublist(startIndex, endIndex);
+
+      return Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+          color: const Color(0xFF9BCF7F),
+          border: Border.all(color: Colors.black, width: 1),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Text(
+                'Buyer Wise Fabric Data with Aging',
+                style: const TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
+              ),
+            ),
+            // const SizedBox(height: 4),
+
+            // Header Table (Separate)
+            Table(
+              border: TableBorder.all(color: Colors.black, width: 0.5),
+              columnWidths: const {
+                0: FlexColumnWidth(1.6),
+                1: FlexColumnWidth(1.7),
+                2: FlexColumnWidth(2),
+                3: FlexColumnWidth(2),
+                4: FlexColumnWidth(2),
+              },
+              children: [
+                TableRow(
+                  decoration: BoxDecoration(color: Colors.white),
+                  children: [
+                    _buildHeaderCell('Buyer Name'),
+                    _buildHeaderCell('Total Volume (yard)'),
+                    _buildHeaderCell(
+                      '< 1 Year',
+                      textColor: Colors.white,
+                      backgroundColor: Colors.green,
+                    ),
+                    _buildHeaderCell(
+                      '1 Year < to > 2 Years',
+                      textColor: Colors.white,
+                      backgroundColor: Colors.orange,
+                    ),
+                    _buildHeaderCell(
+                      // '2 Years < to > 3 Years',
+                      '2 Years +',
+                      textColor: Colors.white,
+                      backgroundColor: Colors.red,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
+            // Total Row
+            Table(
+              border: TableBorder.all(color: Colors.black, width: 0.5),
+              columnWidths: const {
+                0: FlexColumnWidth(1.6),
+                1: FlexColumnWidth(1.7),
+                2: FlexColumnWidth(2),
+                3: FlexColumnWidth(2),
+                4: FlexColumnWidth(2),
+              },
+              children: [
+                TableRow(
+                  decoration: BoxDecoration(color: Colors.white),
+                  children: [
+                    _buildHeaderCell('Total'),
+                    _buildDataCell(formatNumber(totalVolume)),
+                    _buildDataCell(calculatePercentageSpan(totalYear1, totalVolume)),
+                    _buildDataCell(calculatePercentageSpan(totalYear2, totalVolume)),
+                    _buildDataCell(calculatePercentageSpan(totalYear3, totalVolume)),
+                  ],
+                ),
+              ],
+            ),
+
+            // Data Table (Separate)
+            Expanded(
+              child: SingleChildScrollView(
+                child: Table(
+                  border: TableBorder.all(color: Colors.black, width: 0.5),
+                  columnWidths: const {
+                    0: FlexColumnWidth(1.6),
+                    1: FlexColumnWidth(1.7),
+                    2: FlexColumnWidth(2),
+                    3: FlexColumnWidth(2),
+                    4: FlexColumnWidth(2),
+                  },
+                  children: [
+                    // Data rows from current page
+                    ...currentPageData.map(
+                          (data) => _buildDataRow(
+                        data.buyer ?? 'N/A',
+                        data.total3Years ?? 0,
+                        data.year1 ?? 0,
+                        data.year2 ?? 0,
+                        data.year3 ?? 0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            // Page indicator
+            Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(
+                  (warehouseList.length / _rowsPerPage).ceil(),
+                      (index) => Padding(
+                    padding: const EdgeInsets.all(2.0),
+                    child: Container(
+                      width: 5,
+                      height: 5,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: _currentPage == index
+                            ? Colors.black
+                            : Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      );
+    });
+  }
+
+  TableRow _buildDataRow(
+      String buyer,
+      int total,
+      int year1,
+      int year2,
+      int year3,
+      ) {
+    return TableRow(
+      decoration: const BoxDecoration(color: Colors.white),
+      children: [
+        _buildDataCell(buyer),
+        _buildDataCell(formatNumber(total)),
+        _buildDataCell(calculatePercentageSpan(year1, total)),
+        _buildDataCell(calculatePercentageSpan(year2, total)),
+        _buildDataCell(calculatePercentageSpan(year3, total)),
+      ],
+    );
+  }
+
+  // Separate Header Cell Widget
+  Widget _buildHeaderCell(
+      String text, {
+        Color? textColor,
+        Color? backgroundColor,
+      }) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.055,
+      padding: const EdgeInsets.all(0),
+      decoration: backgroundColor != null
+          ? BoxDecoration(color: backgroundColor)
+          : null,
+      child: Center(
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+            color: textColor ?? Colors.black,
+          ),
+          textAlign: TextAlign.center,
+          maxLines: 2,
+        ),
+      ),
+    );
+  }
+
+  // Separate Data Cell Widget
+  Widget _buildDataCell(dynamic content) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.053,
+      padding: const EdgeInsets.all(1),
+      decoration: const BoxDecoration(color: Colors.white),
+      child: Center(
+        child: content is TextSpan
+            ? RichText(textAlign: TextAlign.center, text: content)
+            : Text(
+          content.toString(),
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.normal,
+            color: Colors.black,
+          ),
+          textAlign: TextAlign.center,
+          maxLines: 2,
+        ),
+      ),
+    );
+  }
+
+  TextSpan calculatePercentageSpan(int part, int total) {
+    if (total == 0) {
+      return const TextSpan(
+        text: '0 (0%)',
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.normal,
+          color: Colors.black,
+        ),
+      );
+    }
+    double percentage = (part / total) * 100;
+    String formattedNumber = formatNumber(part);
+    String formattedPercentage = '${percentage.toStringAsFixed(1)}%';
+
+    return TextSpan(
+      children: [
+        TextSpan(
+          text: '$formattedNumber ',
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.normal,
+            color: Colors.black,
+          ),
+        ),
+        TextSpan(
+          text: '($formattedPercentage)',
+          style: const TextStyle(
+            fontSize: 11,
+            fontWeight: FontWeight.bold,
+            color: Colors.black,
+          ),
+        ),
+      ],
+    );
+  }
+}
