@@ -7,12 +7,15 @@ import 'package:get/get.dart';
 
 import '../controller/ware_house_controller.dart';
 import '../model/fabric_warehouse.dart';
+import '../utils/responsive_utils.dart';
 
 class FabricWarehouseDashboard extends StatelessWidget {
   const FabricWarehouseDashboard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final responsive = context.responsive;
+
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Fabric Warehouse TV Dashboard',
@@ -21,7 +24,7 @@ class FabricWarehouseDashboard extends StatelessWidget {
         backgroundColor: Colors.white,
         body: Container(
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black, width: 2),
+            border: Border.all(color: Colors.black, width: responsive.borderWidth(2)),
           ),
           child: Column(
             children: [
@@ -29,7 +32,7 @@ class FabricWarehouseDashboard extends StatelessWidget {
               const DashboardHeader(),
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.all(10.0),
+                  padding: responsive.allPadding(10.0),
                   child: Column(
                     children: [
                       // Top Row -> Stats + BuyerDataTable
@@ -39,7 +42,7 @@ class FabricWarehouseDashboard extends StatelessWidget {
                           children: [
                             // StatsRow
                             Expanded(flex: 1, child: StatsRow()),
-                            const SizedBox(width: 10),
+                            SizedBox(width: responsive.spacing(10)),
                             // BuyerDataTable
                             Expanded(flex: 1, child: BuyerDataTable()),
                           ],
@@ -47,7 +50,7 @@ class FabricWarehouseDashboard extends StatelessWidget {
                       ),
 
                       // const SizedBox(height: 10),
-                      SizedBox(height: MediaQuery.of(context).size.height * 0.01,),
+                      SizedBox(height: responsive.height(10.8)),
                       // Bottom Row -> Charts
                       Expanded(
                         flex: 1,
@@ -55,9 +58,9 @@ class FabricWarehouseDashboard extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Expanded(child: CapacityChart()),
-                            const SizedBox(width: 16),
+                            SizedBox(width: responsive.spacing(16)),
                             Expanded(child: StockAgingChart()),
-                            const SizedBox(width: 16),
+                            SizedBox(width: responsive.spacing(16)),
                             Expanded(child: BuyerWiseChart()),
                           ],
                         ),
@@ -80,6 +83,7 @@ class StatsRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = context.responsive;
     final FabricWarehouseController controller =
         Get.find<FabricWarehouseController>();
     return Obx(() {
@@ -93,7 +97,7 @@ class StatsRow extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text('Error: ${controller.errorMessage.value}'),
-              SizedBox(height: 10),
+              SizedBox(height: responsive.spacing(10)),
               ElevatedButton(
                 onPressed: () => controller.fetchFabricWarehouseData(),
                 child: Text('Retry'),
@@ -114,7 +118,7 @@ class StatsRow extends StatelessWidget {
                   child: AspectRatio(
                     aspectRatio: 2,
                     child: StatCard(
-                      title: 'Total Warehouse capacity\n(m3)',
+                      title: 'Total Warehouse capacity (m3)',
                       subtitle: '(মোট ওয়ারহাউজ ক্যাপাসিটি)',
                       value: '------------',
                       color: const Color(0xFF4ECDC4),
@@ -122,7 +126,7 @@ class StatsRow extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: responsive.spacing(12)),
                 Expanded(
                   child: AspectRatio(
                     aspectRatio: 2,
@@ -139,7 +143,7 @@ class StatsRow extends StatelessWidget {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: responsive.spacing(12)),
             Row(
               children: [
                 Expanded(
@@ -154,12 +158,12 @@ class StatsRow extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: 12),
+                SizedBox(width: responsive.spacing(12)),
                 Expanded(
                   child: AspectRatio(
                     aspectRatio: 2,
                     child: StatCard(
-                      title: 'Total Quantity of Stock Aging\n> 1 year',
+                      title: 'Total Quantity of Stock Aging> 1 year',
                       subtitle: '(মোট ১ বছরের বেশি স্টক এজিং\nপরিমাণ)',
                       value: formatNumber(data.tQtyStockGTh1yr),
                       color: Colors.red,
@@ -197,11 +201,16 @@ class StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = context.responsive;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      padding: EdgeInsets.symmetric(
+        horizontal: responsive.spacing(12),
+        vertical: responsive.spacing(10),
+      ),
       decoration: BoxDecoration(
         color: color,
-        border: Border.all(color: Colors.black, width: 1),
+        border: Border.all(color: Colors.black, width: responsive.borderWidth(1)),
       ),
       child: Stack(
         children: [
@@ -214,8 +223,8 @@ class StatCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       title,
-                      style: const TextStyle(
-                        fontSize: 12,
+                      style: TextStyle(
+                        fontSize: responsive.fontSize(20),
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                         height: 1.2,
@@ -225,12 +234,12 @@ class StatCard extends StatelessWidget {
 
                   // 🔑 either icon or text
                   if (icon != null)
-                    Icon(icon, color: Colors.white, size: 24)
+                    Icon(icon, color: Colors.white, size: responsive.iconSize(24))
                   else if (iconText != null)
                     Text(
                       iconText!,
-                      style: const TextStyle(
-                        fontSize: 16,
+                      style: TextStyle(
+                        fontSize: responsive.fontSize(20),
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
@@ -238,10 +247,10 @@ class StatCard extends StatelessWidget {
                 ],
               ),
               if (subtitle.isNotEmpty) ...[
-                const SizedBox(height: 4),
+                SizedBox(height: responsive.spacing(4)),
                 Text(
                   subtitle,
-                  style: const TextStyle(fontSize: 10, color: Colors.white),
+                  style: TextStyle(fontSize: responsive.fontSize(18), color: Colors.white),
                 ),
               ],
             ],
@@ -249,14 +258,14 @@ class StatCard extends StatelessWidget {
 
           // Fixed positioned value text - 5px from bottom
           Positioned(
-            bottom: 5,
+            bottom: responsive.spacing(5),
             left: 0,
             right: 0,
             child: Center(
               child: Text(
                 value,
-                style: const TextStyle(
-                  fontSize: 24,
+                style: TextStyle(
+                  fontSize: responsive.fontSize(35),
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),
@@ -571,41 +580,53 @@ class CapacityChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = context.responsive;
+
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: responsive.allPadding(10),
       decoration: BoxDecoration(
-        border: Border.all(color: Colors.black, width: 1),
+        border: Border.all(color: Colors.black, width: responsive.borderWidth(1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Capacity vs Occupation (ক্যাপাসিটি VS অকুপেশন)',
-            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+          SizedBox(
+            height: responsive.spacing(30),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                'Capacity vs Occupation (ক্যাপাসিটি VS অকুপেশন)',
+                style: TextStyle(fontSize: responsive.fontSize(20), fontWeight: FontWeight.bold),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
           ),
-          // const SizedBox(height: 10),
+          SizedBox(height: responsive.spacing(8)),
           Expanded(
             child: Center(
               child: CustomPaint(
-                size: const Size(200, 200),
+                size: responsive.chartSize(380),
                 painter: DonutChartPainter([
                   ChartData(
                     'Total capacity (m3)', 50.0,const Color(0xFF5CB85C),
                   ),
                   ChartData('Occupied Area (m3)', 50.0, Colors.red),
                   //ChartData('Occupied Area (m3)', 33.0, const Color(0xFFD9534F)),
-                ]),
+                ], fontSizeScale: responsive.screenWidth / ResponsiveUtils.baseWidth),
               ),
             ),
           ),
-          // const SizedBox(height: 8),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildLegend(const Color(0xFF5CB85C), 'Total capacity (m3)'),
-
-              _buildLegend(Colors.red, 'Occupied Area (m3)'),
-            ],
+          SizedBox(height: responsive.spacing(8)),
+          SizedBox(
+            height: responsive.spacing(20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _buildLegend(const Color(0xFF5CB85C), 'Total capacity (m3)'),
+                _buildLegend(Colors.red, 'Occupied Area (m3)'),
+              ],
+            ),
           ),
         ],
       ),
@@ -613,16 +634,29 @@ class CapacityChart extends StatelessWidget {
   }
 
   Widget _buildLegend(Color color, String text) {
-    return Row(
-      children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 4),
-        Text(text, style: const TextStyle(fontSize: 12)),
-      ],
+    return Builder(
+      builder: (context) {
+        final responsive = context.responsive;
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: responsive.spacing(12),
+              height: responsive.spacing(12),
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+            ),
+            SizedBox(width: responsive.spacing(4)),
+            Flexible(
+              child: Text(
+                text,
+                style: TextStyle(fontSize: responsive.fontSize(18)),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -632,6 +666,7 @@ class StockAgingChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = context.responsive;
     final FabricWarehouseController controller =
         Get.find<FabricWarehouseController>();
 
@@ -652,9 +687,9 @@ class StockAgingChart extends StatelessWidget {
           warehouseList.isEmpty ||
           totalStockAging == 0) {
         return Container(
-          padding: const EdgeInsets.all(10),
+          padding: responsive.allPadding(10),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black, width: 1),
+            border: Border.all(color: Colors.black, width: responsive.borderWidth(1)),
           ),
           child: Center(child: Text('No data available')),
         );
@@ -677,21 +712,30 @@ class StockAgingChart extends StatelessWidget {
       double year3Percentage = (year3Total / totalStockAging) * 100;
 
       return Container(
-        padding: const EdgeInsets.all(10),
+        padding: responsive.allPadding(10),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.black, width: 1),
+          border: Border.all(color: Colors.black, width: responsive.borderWidth(1)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Stock Aging % (স্টক এজিং)',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+            SizedBox(
+              height: responsive.spacing(30),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Stock Aging % (স্টক এজিং)',
+                  style: TextStyle(fontSize: responsive.fontSize(20), fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ),
+            SizedBox(height: responsive.spacing(8)),
             Expanded(
               child: Center(
                 child: CustomPaint(
-                  size: const Size(200, 200),
+                  size: responsive.chartSize(380),
                   painter: DonutChartPainter([
                     ChartData('0 - 11 Mo', year1Percentage, Colors.green),
                     ChartData(
@@ -700,22 +744,21 @@ class StockAgingChart extends StatelessWidget {
                       Colors.orange,
                     ),
                     ChartData('> 2 Yrs - 3 Yrs', year3Percentage, Colors.red),
-                  ]),
+                  ], fontSizeScale: responsive.screenWidth / ResponsiveUtils.baseWidth),
                 ),
               ),
             ),
-            // const SizedBox(height: 8),
-            Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildLegend(Colors.green, '0 - 1 Year'),
-                    _buildLegend(Colors.orange, '> 1 Year - 2 Years '),
-                    _buildLegend(Colors.red, '> 2 Years - 3 Years '),
-                  ],
-                ),
-              ],
+            SizedBox(height: responsive.spacing(8)),
+            SizedBox(
+              height: responsive.spacing(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildLegend(Colors.green, '0 - 1 Year'),
+                  _buildLegend(Colors.orange, '> 1 Year - 2 Years'),
+                  _buildLegend(Colors.red, '> 2 Years - 3 Years'),
+                ],
+              ),
             ),
           ],
         ),
@@ -724,16 +767,30 @@ class StockAgingChart extends StatelessWidget {
   }
 
   Widget _buildLegend(Color color, String text) {
-    return Row(
-      children: [
-        Container(
-          width: 10,
-          height: 10,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 4),
-        Text(text, style: const TextStyle(fontSize: 12)),
-      ],
+    return Builder(
+      builder: (context) {
+        final responsive = context.responsive;
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Container(
+              width: responsive.spacing(15),
+              height: responsive.spacing(15),
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+            ),
+            SizedBox(width: responsive.spacing(4)),
+            Flexible(
+              child: Text(
+                text,
+                style: TextStyle(fontSize: responsive.fontSize(18)),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        );
+      },
     );
   }
 }
@@ -743,6 +800,7 @@ class BuyerWiseChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = context.responsive;
     final FabricWarehouseController controller =
         Get.find<FabricWarehouseController>();
 
@@ -762,9 +820,9 @@ class BuyerWiseChart extends StatelessWidget {
 
       if (warehouseList == null || warehouseList.isEmpty) {
         return Container(
-          padding: const EdgeInsets.all(10),
+          padding: responsive.allPadding(10),
           decoration: BoxDecoration(
-            border: Border.all(color: Colors.black, width: 1),
+            border: Border.all(color: Colors.black, width: responsive.borderWidth(1)),
           ),
           child: Center(child: Text('No data available')),
         );
@@ -828,26 +886,35 @@ class BuyerWiseChart extends StatelessWidget {
       }
 
       return Container(
-        padding: const EdgeInsets.all(10),
+        padding: responsive.allPadding(10),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.black, width: 1),
+          border: Border.all(color: Colors.black, width: responsive.borderWidth(1)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              'Occupied % (Buyer Wise) অকুপাইড % বায়ার ওয়াইজ',
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-            ),
-            Expanded(
-              child: Center(
-                child: CustomPaint(
-                  size: const Size(200, 200),
-                  painter: DonutChartPainter(chartData),
+            SizedBox(
+              height: responsive.spacing(30),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Occupied % (Buyer Wise) অকুপাইড % বায়ার ওয়াইজ',
+                  style: TextStyle(fontSize: responsive.fontSize(20), fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
             ),
-            // const SizedBox(height: 8),
+            SizedBox(height: responsive.spacing(8)),
+            Expanded(
+              child: Center(
+                child: CustomPaint(
+                  size: responsive.chartSize(380),
+                  painter: DonutChartPainter(chartData, fontSizeScale: responsive.screenWidth / ResponsiveUtils.baseWidth),
+                ),
+              ),
+            ),
+            SizedBox(height: responsive.spacing(8)),
             AutoScrollLegend(chartData: chartData),
           ],
         ),
@@ -866,8 +933,9 @@ class ChartData {
 
 class DonutChartPainter extends CustomPainter {
   final List<ChartData> data;
+  final double fontSizeScale;
 
-  DonutChartPainter(this.data);
+  DonutChartPainter(this.data, {this.fontSizeScale = 1.0});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -917,13 +985,13 @@ class DonutChartPainter extends CustomPainter {
             text: '$percentage%',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 12,
+              fontSize: 24 * fontSizeScale,
               fontWeight: FontWeight.bold,
               shadows: [
                 Shadow(
-                  offset: Offset(1, 1),
-                  blurRadius: 2,
-                  color: Colors.black.withOpacity(0.5),
+                  offset: Offset(1 * fontSizeScale, 1 * fontSizeScale),
+                  blurRadius: 2 * fontSizeScale,
+                  color: Colors.black.withValues(alpha: 0.5),
                 ),
               ],
             ),
@@ -989,8 +1057,10 @@ class _AutoScrollLegendState extends State<AutoScrollLegend> {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = context.responsive;
+
     return SizedBox(
-      height: 20,
+      height: responsive.spacing(20),
       child: ListView.builder(
         controller: _controller,
         scrollDirection: Axis.horizontal,
@@ -999,21 +1069,22 @@ class _AutoScrollLegendState extends State<AutoScrollLegend> {
           final data = widget.chartData[i % widget.chartData.length];
           return Row(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Container(
-                width: 10,
-                height: 10,
+                width: responsive.spacing(15),
+                height: responsive.spacing(15),
                 decoration: BoxDecoration(
                   color: data.color,
                   shape: BoxShape.rectangle,
                 ),
               ),
-              const SizedBox(width: 4),
+              SizedBox(width: responsive.spacing(4)),
               Text(
                 '${data.label} (${data.value.toStringAsFixed(2)}%)',
-                style: const TextStyle(fontSize: 12),
+                style: TextStyle(fontSize: responsive.fontSize(18)),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: responsive.spacing(10)),
             ],
           );
         },

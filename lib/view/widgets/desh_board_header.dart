@@ -4,12 +4,14 @@ import 'package:get/get.dart';
 
 import '../../controller/ware_house_controller.dart';
 import '../../services/company_maper.dart';
+import '../../utils/responsive_utils.dart';
 
 class DashboardHeader extends StatelessWidget {
   const DashboardHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final responsive = context.responsive;
     final String currentDate = DateFormat('dd.MM.yyyy').format(DateTime.now());
     final controller = Get.find<FabricWarehouseController>();
 
@@ -18,11 +20,11 @@ class DashboardHeader extends StatelessWidget {
 
       return Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 0),
+        padding: EdgeInsets.symmetric(horizontal: responsive.spacing(40), vertical: 0),
         decoration: BoxDecoration(
           color: Colors.grey.shade300,
-          border: const Border(
-            bottom: BorderSide(color: Colors.black, width: 1),
+          border: Border(
+            bottom: BorderSide(color: Colors.black, width: responsive.borderWidth(1)),
           ),
         ),
         child: Row(
@@ -32,21 +34,21 @@ class DashboardHeader extends StatelessWidget {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
-              children: const [
+              children: [
                 Text(
                   'Fabric Warehouse Dashboard',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: responsive.fontSize(16),
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                     letterSpacing: 1.0,
                   ),
                 ),
-                SizedBox(height: 4),
+                SizedBox(height: responsive.spacing(4)),
                 Text(
                   'ফ্যাব্রিক ওয়ারহাউজ ড্যাশবোর্ড',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: responsive.fontSize(16),
                     fontWeight: FontWeight.w500,
                     color: Colors.black,
                   ),
@@ -58,16 +60,16 @@ class DashboardHeader extends StatelessWidget {
               children: [
                 Text(
                   companyName,
-                  style: const TextStyle(
-                    fontSize: 14,
+                  style: TextStyle(
+                    fontSize: responsive.fontSize(16),
                     fontWeight: FontWeight.w600,
                     color: Colors.black,
                   ),
                 ),
                 Text(
                   'Date : $currentDate',
-                  style: const TextStyle(
-                    fontSize: 14,
+                  style: TextStyle(
+                    fontSize: responsive.fontSize(16),
                     fontWeight: FontWeight.w600,
                     color: Colors.black,
                   ),

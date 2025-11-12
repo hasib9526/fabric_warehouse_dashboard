@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../controller/ware_house_controller.dart';
+import '../../utils/responsive_utils.dart';
 
 class BuyerDataTable extends StatefulWidget {
   const BuyerDataTable({super.key});
@@ -12,7 +13,7 @@ class BuyerDataTable extends StatefulWidget {
 }
 
 class _BuyerDataTableState extends State<BuyerDataTable> {
-  final int _rowsPerPage = 5;
+  final int _rowsPerPage = 5 ;
   int _currentPage = 0;
   late Timer _timer;
   final FabricWarehouseController controller =
@@ -44,6 +45,8 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
 
   @override
   Widget build(BuildContext context) {
+    final responsive = context.responsive;
+
     return Obx(() {
       if (controller.isLoading.value) {
         return Center(child: CircularProgressIndicator());
@@ -55,7 +58,7 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text('Error: ${controller.errorMessage.value}'),
-              SizedBox(height: 10),
+              SizedBox(height: responsive.spacing(10)),
               ElevatedButton(
                 onPressed: () => controller.fetchFabricWarehouseData(),
                 child: Text('Retry'),
@@ -93,10 +96,10 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
       final currentPageData = warehouseList.sublist(startIndex, endIndex);
 
       return Container(
-        padding: const EdgeInsets.all(4),
+        padding: responsive.allPadding(4),
         decoration: BoxDecoration(
           color: const Color(0xFF9BCF7F),
-          border: Border.all(color: Colors.black, width: 1),
+          border: Border.all(color: Colors.black, width: responsive.borderWidth(1)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,8 +107,8 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
             Center(
               child: Text(
                 'Buyer Wise Fabric Data with Aging',
-                style: const TextStyle(
-                  fontSize: 15,
+                style: TextStyle(
+                  fontSize: responsive.fontSize(18),
                   fontWeight: FontWeight.bold,
                   color: Colors.black,
                 ),
@@ -115,7 +118,7 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
 
             // Header Table (Separate)
             Table(
-              border: TableBorder.all(color: Colors.black, width: 0.5),
+              border: TableBorder.all(color: Colors.black, width: responsive.borderWidth(0.5)),
               columnWidths: const {
                 0: FlexColumnWidth(1.6),
                 1: FlexColumnWidth(1.7),
@@ -152,7 +155,7 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
 
             // Total Row
             Table(
-              border: TableBorder.all(color: Colors.black, width: 0.5),
+              border: TableBorder.all(color: Colors.black, width: responsive.borderWidth(0.5)),
               columnWidths: const {
                 0: FlexColumnWidth(1.6),
                 1: FlexColumnWidth(1.7),
@@ -178,7 +181,7 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
             Expanded(
               child: SingleChildScrollView(
                 child: Table(
-                  border: TableBorder.all(color: Colors.black, width: 0.5),
+                  border: TableBorder.all(color: Colors.black, width: responsive.borderWidth(0.5)),
                   columnWidths: const {
                     0: FlexColumnWidth(1.6),
                     1: FlexColumnWidth(1.7),
@@ -209,10 +212,10 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
                 children: List.generate(
                   (warehouseList.length / _rowsPerPage).ceil(),
                       (index) => Padding(
-                    padding: const EdgeInsets.all(2.0),
+                    padding: responsive.allPadding(2.0),
                     child: Container(
-                      width: 5,
-                      height: 5,
+                      width: responsive.spacing(5),
+                      height: responsive.spacing(6),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: _currentPage == index
@@ -255,9 +258,11 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
         Color? textColor,
         Color? backgroundColor,
       }) {
+    final responsive = context.responsive;
+
     return Container(
-      height: MediaQuery.of(context).size.height * 0.055,
-      padding: const EdgeInsets.all(0),
+      height: responsive.height(65.0),
+      padding: EdgeInsets.all(0),
       decoration: backgroundColor != null
           ? BoxDecoration(color: backgroundColor)
           : null,
@@ -265,7 +270,7 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
         child: Text(
           text,
           style: TextStyle(
-            fontSize: 12,
+            fontSize: responsive.fontSize(18),
             fontWeight: FontWeight.bold,
             color: textColor ?? Colors.black,
           ),
@@ -278,17 +283,19 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
 
   // Separate Data Cell Widget
   Widget _buildDataCell(dynamic content) {
+    final responsive = context.responsive;
+
     return Container(
-      height: MediaQuery.of(context).size.height * 0.053,
-      padding: const EdgeInsets.all(1),
+      height: responsive.height(62.0),
+      padding: responsive.allPadding(1),
       decoration: const BoxDecoration(color: Colors.white),
       child: Center(
         child: content is TextSpan
             ? RichText(textAlign: TextAlign.center, text: content)
             : Text(
           content.toString(),
-          style: const TextStyle(
-            fontSize: 11,
+          style: TextStyle(
+            fontSize: responsive.fontSize(18),
             fontWeight: FontWeight.normal,
             color: Colors.black,
           ),
@@ -300,11 +307,13 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
   }
 
   TextSpan calculatePercentageSpan(int part, int total) {
+    final responsive = context.responsive;
+
     if (total == 0) {
-      return const TextSpan(
+      return TextSpan(
         text: '0 (0%)',
         style: TextStyle(
-          fontSize: 11,
+          fontSize: responsive.fontSize(18),
           fontWeight: FontWeight.normal,
           color: Colors.black,
         ),
@@ -318,16 +327,16 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
       children: [
         TextSpan(
           text: '$formattedNumber ',
-          style: const TextStyle(
-            fontSize: 11,
+          style: TextStyle(
+            fontSize: responsive.fontSize(18),
             fontWeight: FontWeight.normal,
             color: Colors.black,
           ),
         ),
         TextSpan(
           text: '($formattedPercentage)',
-          style: const TextStyle(
-            fontSize: 11,
+          style: TextStyle(
+            fontSize: responsive.fontSize(18),
             fontWeight: FontWeight.bold,
             color: Colors.black,
           ),
