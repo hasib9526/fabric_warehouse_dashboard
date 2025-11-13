@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import 'controller/ware_house_controller.dart';
 
@@ -25,6 +26,8 @@ void main() async {
   HttpOverrides.global = MyHttpOverrides();
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setEnabledSystemUIMode(SystemUiMode.leanBack);
+  // Enable wakelock to keep screen awake
+  await WakelockPlus.enable();
   runApp(const FabricWarehouseDashboard());
   Get.put(FabricWarehouseController());
 }

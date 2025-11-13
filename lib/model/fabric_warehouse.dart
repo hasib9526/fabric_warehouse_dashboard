@@ -4,9 +4,11 @@ class FabricWarehouse {
   List<WarehouseList>? warehouseList;
   int? tQtyStockAging;
   int? tQtyStockGTh1yr;
+  double? totalCapacity;
+  double? totalUsed;
 
   FabricWarehouse(
-      {this.warehouseList, this.tQtyStockAging, this.tQtyStockGTh1yr});
+      {this.warehouseList, this.tQtyStockAging, this.tQtyStockGTh1yr, this.totalCapacity, this.totalUsed});
 
   FabricWarehouse.fromJson(Map<String, dynamic> json) {
     if (json['WarehouseList'] != null) {
@@ -19,6 +21,8 @@ class FabricWarehouse {
     // Handle both int and double values from API
     tQtyStockAging = _parseInt(json['tQtyStockAging']);
     tQtyStockGTh1yr = _parseInt(json['tQtyStockGTh1yr']);
+    totalCapacity = _parseDouble(json['TotalCapacity']);
+    totalUsed = _parseDouble(json['TotalUsed']);
   }
 
   // Helper method to parse both int and double values
@@ -30,6 +34,15 @@ class FabricWarehouse {
     return null;
   }
 
+  // Helper method to parse double values
+  double? _parseDouble(dynamic value) {
+    if (value == null) return null;
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is String) return double.tryParse(value);
+    return null;
+  }
+
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     if (warehouseList != null) {
@@ -38,6 +51,8 @@ class FabricWarehouse {
     }
     data['tQtyStockAging'] = tQtyStockAging;
     data['tQtyStockGTh1yr'] = tQtyStockGTh1yr;
+    data['TotalCapacity'] = totalCapacity;
+    data['TotalUsed'] = totalUsed;
     return data;
   }
 }

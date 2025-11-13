@@ -120,8 +120,8 @@ class StatsRow extends StatelessWidget {
                     child: StatCard(
                       title: 'Total Warehouse capacity (m3)',
                       subtitle: '(মোট ওয়ারহাউজ ক্যাপাসিটি)',
-                      value: '------------',
-                      color: const Color(0xFF4ECDC4),
+                      value: formatDecimalNumber(data.totalCapacity),
+                      color: const Color(0xFF329C94),
                       icon: Icons.warehouse_outlined,
                     ),
                   ),
@@ -132,8 +132,8 @@ class StatsRow extends StatelessWidget {
                     aspectRatio: 2,
                     child: StatCard(
                       title:
-                          'Total Quantity of Stock Aging\n(মোট স্টক এজিং পরিমাণ)',
-                      subtitle: '',
+                          'Total Quantity of Stock Aging',
+                      subtitle: '(মোট স্টক এজিং পরিমাণ)',
                       value: formatNumber(data.tQtyStockAging),
                       color: const Color(0xFFF7B731),
                       // Yellow box
@@ -152,7 +152,7 @@ class StatsRow extends StatelessWidget {
                     child: StatCard(
                       title: 'Total Occupied Area (m3)',
                       subtitle: '(মোট দখলকৃত এলাকা)',
-                      value: '-------------',
+                      value: formatDecimalNumber(data.totalUsed),
                       color: const Color(0xFF5CB85C),
                       icon: Icons.warehouse_outlined,
                     ),
@@ -164,7 +164,7 @@ class StatsRow extends StatelessWidget {
                     aspectRatio: 2,
                     child: StatCard(
                       title: 'Total Quantity of Stock Aging> 1 year',
-                      subtitle: '(মোট ১ বছরের বেশি স্টক এজিং\nপরিমাণ)',
+                      subtitle: '(মোট ১ বছরের বেশি স্টক এজিং পরিমাণ)',
                       value: formatNumber(data.tQtyStockGTh1yr),
                       color: Colors.red,
                       // Red box
@@ -224,7 +224,7 @@ class StatCard extends StatelessWidget {
                     child: Text(
                       title,
                       style: TextStyle(
-                        fontSize: responsive.fontSize(20),
+                        fontSize: responsive.fontSize(21),
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                         height: 1.2,
@@ -250,7 +250,7 @@ class StatCard extends StatelessWidget {
                 SizedBox(height: responsive.spacing(4)),
                 Text(
                   subtitle,
-                  style: TextStyle(fontSize: responsive.fontSize(18), color: Colors.white),
+                  style: TextStyle(fontSize: responsive.fontSize(20), color: Colors.white),
                 ),
               ],
             ],
@@ -581,56 +581,76 @@ class CapacityChart extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final responsive = context.responsive;
+    final FabricWarehouseController controller =
+        Get.find<FabricWarehouseController>();
 
-    return Container(
-      padding: responsive.allPadding(10),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.black, width: responsive.borderWidth(1)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            height: responsive.spacing(30),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Text(
-                'Capacity vs Occupation (ক্যাপাসিটি VS অকুপেশন)',
-                style: TextStyle(fontSize: responsive.fontSize(20), fontWeight: FontWeight.bold),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+    return Obx(() {
+      if (controller.isLoading.value) {
+        return Center(child: CircularProgressIndicator());
+      }
+
+      if (controller.errorMessage.value.isNotEmpty) {
+        return Center(child: Text('Error loading data'));
+      }
+
+      final data = controller.fabricWarehouse.value;
+      final totalCapacity = data.totalCapacity ?? 0.0;
+      final totalUsed = data.totalUsed ?? 0.0;
+
+      // Calculate percentages
+      final total = totalCapacity;
+      final capacityPercentage = total > 0 ? (totalCapacity / total) * 100 : 50.0;
+      final usedPercentage = total > 0 ? (totalUsed / total) * 100 : 50.0;
+
+      return Container(
+        padding: responsive.allPadding(10),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black, width: responsive.borderWidth(1)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              height: responsive.spacing(30),
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'Capacity vs Occupation (ক্যাপাসিটি VS অকুপেশন)',
+                  style: TextStyle(fontSize: responsive.fontSize(20), fontWeight: FontWeight.bold),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
-          ),
-          SizedBox(height: responsive.spacing(8)),
-          Expanded(
-            child: Center(
-              child: CustomPaint(
-                size: responsive.chartSize(380),
-                painter: DonutChartPainter([
-                  ChartData(
-                    'Total capacity (m3)', 50.0,const Color(0xFF5CB85C),
-                  ),
-                  ChartData('Occupied Area (m3)', 50.0, Colors.red),
-                  //ChartData('Occupied Area (m3)', 33.0, const Color(0xFFD9534F)),
-                ], fontSizeScale: responsive.screenWidth / ResponsiveUtils.baseWidth),
+            SizedBox(height: responsive.spacing(8)),
+            Expanded(
+              child: Center(
+                child: CustomPaint(
+                  size: responsive.chartSize(380),
+                  painter: DonutChartPainter([
+                    ChartData(
+                      'Total capacity (m3)', capacityPercentage, const Color(0xFF329C94),
+                    ),
+                    ChartData('Occupied Area (m3)', usedPercentage, Color(0xFF5CB85C)),
+                  ], fontSizeScale: responsive.screenWidth / ResponsiveUtils.baseWidth),
+                ),
               ),
             ),
-          ),
-          SizedBox(height: responsive.spacing(8)),
-          SizedBox(
-            height: responsive.spacing(20),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildLegend(const Color(0xFF5CB85C), 'Total capacity (m3)'),
-                _buildLegend(Colors.red, 'Occupied Area (m3)'),
-              ],
+            SizedBox(height: responsive.spacing(8)),
+            SizedBox(
+              height: responsive.spacing(20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildLegend(const Color(0xFF4ECDC4), 'Total capacity (m3)'),
+                  _buildLegend(Color(0xFF5CB85C), 'Occupied Area (m3)'),
+                ],
+              ),
             ),
-          ),
-        ],
-      ),
-    );
+          ],
+        ),
+      );
+    });
   }
 
   Widget _buildLegend(Color color, String text) {

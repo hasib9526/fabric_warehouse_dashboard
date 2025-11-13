@@ -38,6 +38,7 @@ dependencies:
   http:
   intl:
   marquee:
+  wakelock_plus: ^1.2.8
 
 
 dev_dependencies:
