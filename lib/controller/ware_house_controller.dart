@@ -79,11 +79,11 @@ class FabricWarehouseController extends GetxController {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        // Update the existing fabricWarehouse object with capacity data
+        // Update the existing fabricWarehouse object with capacity data silently
         final currentWarehouse = fabricWarehouse.value;
         currentWarehouse.totalCapacity = _parseDouble(data['TotalCapacity']);
         currentWarehouse.totalUsed = _parseDouble(data['TotalUsed']);
-        fabricWarehouse(currentWarehouse);
+        // Trigger update without changing loading state
         fabricWarehouse.refresh();
       } else {
         throw Exception('Server error: ${response.statusCode}');

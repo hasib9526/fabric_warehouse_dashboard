@@ -10,6 +10,6 @@ class ApiConfig {
   }
 
   static String fabricWarehouseCapacityUrl(String companyId) {
-    return "$baseUrll/GetFabricWarehouseCapacity?companyId=$companyId";
+    return "$baseUrl/GetFabricWarehouseCapacity?companyId=$companyId";
   }
 }

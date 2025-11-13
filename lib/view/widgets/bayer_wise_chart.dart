@@ -48,26 +48,6 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
     final responsive = context.responsive;
 
     return Obx(() {
-      if (controller.isLoading.value) {
-        return Center(child: CircularProgressIndicator());
-      }
-
-      if (controller.errorMessage.value.isNotEmpty) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Error: ${controller.errorMessage.value}'),
-              SizedBox(height: responsive.spacing(10)),
-              ElevatedButton(
-                onPressed: () => controller.fetchFabricWarehouseData(),
-                child: Text('Retry'),
-              ),
-            ],
-          ),
-        );
-      }
-
       final warehouseList = controller.fabricWarehouse.value.warehouseList;
 
       if (warehouseList == null || warehouseList.isEmpty) {

@@ -15,6 +15,7 @@ class FabricWarehouseDashboard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final responsive = context.responsive;
+    final FabricWarehouseController controller = Get.find<FabricWarehouseController>();
 
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
@@ -31,43 +32,73 @@ class FabricWarehouseDashboard extends StatelessWidget {
               // Header
               const DashboardHeader(),
               Expanded(
-                child: Padding(
-                  padding: responsive.allPadding(10.0),
-                  child: Column(
-                    children: [
-                      // Top Row -> Stats + BuyerDataTable
-                      Expanded(
-                        flex: 1,
-                        child: Row(
-                          children: [
-                            // StatsRow
-                            Expanded(flex: 1, child: StatsRow()),
-                            SizedBox(width: responsive.spacing(10)),
-                            // BuyerDataTable
-                            Expanded(flex: 1, child: BuyerDataTable()),
-                          ],
-                        ),
-                      ),
+                child: Obx(() {
+                  // Show single loader for entire screen
+                  if (controller.isLoading.value) {
+                    return Center(
+                      child: CircularProgressIndicator(),
+                    );
+                  }
 
-                      // const SizedBox(height: 10),
-                      SizedBox(height: responsive.height(10.8)),
-                      // Bottom Row -> Charts
-                      Expanded(
-                        flex: 1,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(child: CapacityChart()),
-                            SizedBox(width: responsive.spacing(16)),
-                            Expanded(child: StockAgingChart()),
-                            SizedBox(width: responsive.spacing(16)),
-                            Expanded(child: BuyerWiseChart()),
-                          ],
-                        ),
+                  // Show error with retry button
+                  if (controller.errorMessage.value.isNotEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Error: ${controller.errorMessage.value}',
+                            style: TextStyle(fontSize: responsive.fontSize(20)),
+                          ),
+                          SizedBox(height: responsive.spacing(10)),
+                          ElevatedButton(
+                            onPressed: () => controller.fetchFabricWarehouseData(showLoading: true),
+                            child: Text('Retry'),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
-                ),
+                    );
+                  }
+
+                  // Show main content
+                  return Padding(
+                    padding: responsive.allPadding(10.0),
+                    child: Column(
+                      children: [
+                        // Top Row -> Stats + BuyerDataTable
+                        Expanded(
+                          flex: 1,
+                          child: Row(
+                            children: [
+                              // StatsRow
+                              Expanded(flex: 1, child: StatsRow()),
+                              SizedBox(width: responsive.spacing(10)),
+                              // BuyerDataTable
+                              Expanded(flex: 1, child: BuyerDataTable()),
+                            ],
+                          ),
+                        ),
+
+                        // const SizedBox(height: 10),
+                        SizedBox(height: responsive.height(10.8)),
+                        // Bottom Row -> Charts
+                        Expanded(
+                          flex: 1,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(child: CapacityChart()),
+                              SizedBox(width: responsive.spacing(16)),
+                              Expanded(child: StockAgingChart()),
+                              SizedBox(width: responsive.spacing(16)),
+                              Expanded(child: BuyerWiseChart()),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }),
               ),
             ],
           ),
@@ -87,26 +118,6 @@ class StatsRow extends StatelessWidget {
     final FabricWarehouseController controller =
         Get.find<FabricWarehouseController>();
     return Obx(() {
-      if (controller.isLoading.value) {
-        return Center(child: CircularProgressIndicator());
-      }
-
-      if (controller.errorMessage.value.isNotEmpty) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text('Error: ${controller.errorMessage.value}'),
-              SizedBox(height: responsive.spacing(10)),
-              ElevatedButton(
-                onPressed: () => controller.fetchFabricWarehouseData(),
-                child: Text('Retry'),
-              ),
-            ],
-          ),
-        );
-      }
-
       final data = controller.fabricWarehouse.value;
       return SizedBox(
         width: 25,
@@ -585,14 +596,6 @@ class CapacityChart extends StatelessWidget {
         Get.find<FabricWarehouseController>();
 
     return Obx(() {
-      if (controller.isLoading.value) {
-        return Center(child: CircularProgressIndicator());
-      }
-
-      if (controller.errorMessage.value.isNotEmpty) {
-        return Center(child: Text('Error loading data'));
-      }
-
       final data = controller.fabricWarehouse.value;
       final totalCapacity = data.totalCapacity ?? 0.0;
       final totalUsed = data.totalUsed ?? 0.0;
@@ -691,14 +694,6 @@ class StockAgingChart extends StatelessWidget {
         Get.find<FabricWarehouseController>();
 
     return Obx(() {
-      if (controller.isLoading.value) {
-        return Center(child: CircularProgressIndicator());
-      }
-
-      if (controller.errorMessage.value.isNotEmpty) {
-        return Center(child: Text('Error loading data'));
-      }
-
       final warehouseList = controller.fabricWarehouse.value.warehouseList;
       final totalStockAging =
           controller.fabricWarehouse.value.tQtyStockAging ?? 0;
@@ -825,14 +820,6 @@ class BuyerWiseChart extends StatelessWidget {
         Get.find<FabricWarehouseController>();
 
     return Obx(() {
-      if (controller.isLoading.value) {
-        return Center(child: CircularProgressIndicator());
-      }
-
-      if (controller.errorMessage.value.isNotEmpty) {
-        return Center(child: Text('Error loading data'));
-      }
-
       final warehouseList = controller.fabricWarehouse.value.warehouseList;
       final totalStockAging =
           controller.fabricWarehouse.value.tQtyStockAging ??
