@@ -13,33 +13,63 @@ class BuyerDataTable extends StatefulWidget {
 }
 
 class _BuyerDataTableState extends State<BuyerDataTable> {
-  final int _rowsPerPage = 5 ;
-  int _currentPage = 0;
-  late Timer _timer;
+  final ScrollController _scrollController = ScrollController();
+  Timer? _autoScrollTimer;
+  Timer? _resumeTimer;
+  bool _userScrolling = false;
+  bool _pausedAtBottom = false;
   final FabricWarehouseController controller =
-  Get.find<FabricWarehouseController>();
+      Get.find<FabricWarehouseController>();
 
   @override
   void initState() {
     super.initState();
-    // Set up timer for auto pagination
-    _timer = Timer.periodic(const Duration(seconds: 20), (timer) {
-      if (mounted && controller.fabricWarehouse.value.warehouseList != null) {
-        setState(() {
-          final totalPages =
-          ((controller.fabricWarehouse.value.warehouseList!.length) /
-              _rowsPerPage)
-              .ceil();
-          _currentPage =
-              (_currentPage + 1) % (totalPages == 0 ? 1 : totalPages);
-        });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startAutoScroll();
+    });
+  }
+
+  void _startAutoScroll() {
+    _autoScrollTimer = Timer.periodic(const Duration(milliseconds: 50), (timer) {
+      if (!_userScrolling &&
+          !_pausedAtBottom &&
+          _scrollController.hasClients &&
+          _scrollController.position.hasContentDimensions) {
+        final max = _scrollController.position.maxScrollExtent;
+        final current = _scrollController.offset;
+        if (current >= max) {
+          // নিচে পৌঁছালে ৩ সেকেন্ড থামবে তারপর উপরে যাবে
+          _pausedAtBottom = true;
+          Future.delayed(const Duration(seconds: 3), () {
+            if (mounted && !_userScrolling) {
+              _scrollController.jumpTo(0);
+              _pausedAtBottom = false;
+            }
+          });
+        } else {
+          _scrollController.jumpTo(current + 0.8);
+        }
       }
+    });
+  }
+
+  void _onUserScrollStart() {
+    _userScrolling = true;
+    _resumeTimer?.cancel();
+  }
+
+  void _onUserScrollEnd() {
+    _resumeTimer?.cancel();
+    _resumeTimer = Timer(const Duration(seconds: 3), () {
+      if (mounted) _userScrolling = false;
     });
   }
 
   @override
   void dispose() {
-    _timer.cancel();
+    _autoScrollTimer?.cancel();
+    _resumeTimer?.cancel();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -67,13 +97,13 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
         totalYear3 += data.year3 ?? 0;
       }
 
-      // Calculate the current page data
-      final startIndex = _currentPage * _rowsPerPage;
-      var endIndex = startIndex + _rowsPerPage;
-      if (endIndex > warehouseList.length) {
-        endIndex = warehouseList.length;
-      }
-      final currentPageData = warehouseList.sublist(startIndex, endIndex);
+      const columnWidths = {
+        0: FlexColumnWidth(1.6),
+        1: FlexColumnWidth(1.7),
+        2: FlexColumnWidth(2),
+        3: FlexColumnWidth(2),
+        4: FlexColumnWidth(2),
+      };
 
       return Container(
         padding: responsive.allPadding(4),
@@ -94,58 +124,35 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
                 ),
               ),
             ),
-            // const SizedBox(height: 4),
 
-            // Header Table (Separate)
+            // Header Table (fixed, not scrollable)
             Table(
               border: TableBorder.all(color: Colors.black, width: responsive.borderWidth(0.5)),
-              columnWidths: const {
-                0: FlexColumnWidth(1.6),
-                1: FlexColumnWidth(1.7),
-                2: FlexColumnWidth(2),
-                3: FlexColumnWidth(2),
-                4: FlexColumnWidth(2),
-              },
+              columnWidths: columnWidths,
               children: [
                 TableRow(
                   decoration: BoxDecoration(color: Colors.white),
                   children: [
                     _buildHeaderCell('Buyer Name'),
                     _buildHeaderCell('Total Volume (yard)'),
-                    _buildHeaderCell(
-                      '< 1 Year',
-                      textColor: Colors.white,
-                      backgroundColor: Colors.green,
-                    ),
-                    _buildHeaderCell(
-                      '1 Year < to > 2 Years',
-                      textColor: Colors.white,
-                      backgroundColor: Colors.orange,
-                    ),
-                    _buildHeaderCell(
-                      // '2 Years < to > 3 Years',
-                      '2 Years +',
-                      textColor: Colors.white,
-                      backgroundColor: Colors.red,
-                    ),
+                    _buildHeaderCell('< 1 Year',
+                        textColor: Colors.white, backgroundColor: Colors.green),
+                    _buildHeaderCell('1 Year < to > 2 Years',
+                        textColor: Colors.white, backgroundColor: Colors.orange),
+                    _buildHeaderCell('2 Years +',
+                        textColor: Colors.white, backgroundColor: Colors.red),
                   ],
                 ),
               ],
             ),
 
-            // Total Row
+            // Total Row (fixed, not scrollable)
             Table(
               border: TableBorder.all(color: Colors.black, width: responsive.borderWidth(0.5)),
-              columnWidths: const {
-                0: FlexColumnWidth(1.6),
-                1: FlexColumnWidth(1.7),
-                2: FlexColumnWidth(2),
-                3: FlexColumnWidth(2),
-                4: FlexColumnWidth(2),
-              },
+              columnWidths: columnWidths,
               children: [
                 TableRow(
-                  decoration: BoxDecoration(color: Colors.white),
+                  decoration: BoxDecoration(color: Colors.orange.shade100),
                   children: [
                     _buildHeaderCell('Total'),
                     _buildDataCell(formatNumber(totalVolume)),
@@ -157,52 +164,34 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
               ],
             ),
 
-            // Data Table (Separate)
+            // Scrollable Data Table (auto + manual scroll)
             Expanded(
-              child: SingleChildScrollView(
-                child: Table(
-                  border: TableBorder.all(color: Colors.black, width: responsive.borderWidth(0.5)),
-                  columnWidths: const {
-                    0: FlexColumnWidth(1.6),
-                    1: FlexColumnWidth(1.7),
-                    2: FlexColumnWidth(2),
-                    3: FlexColumnWidth(2),
-                    4: FlexColumnWidth(2),
-                  },
-                  children: [
-                    // Data rows from current page
-                    ...currentPageData.map(
-                          (data) => _buildDataRow(
-                        data.buyer ?? 'N/A',
-                        data.total3Years ?? 0,
-                        data.year1 ?? 0,
-                        data.year2 ?? 0,
-                        data.year3 ?? 0,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            // Page indicator
-            Center(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(
-                  (warehouseList.length / _rowsPerPage).ceil(),
-                      (index) => Padding(
-                    padding: responsive.allPadding(2.0),
-                    child: Container(
-                      width: responsive.spacing(5),
-                      height: responsive.spacing(6),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _currentPage == index
-                            ? Colors.black
-                            : Colors.grey,
-                      ),
-                    ),
+              child: NotificationListener<ScrollNotification>(
+                onNotification: (notification) {
+                  if (notification is ScrollStartNotification &&
+                      notification.dragDetails != null) {
+                    _onUserScrollStart();
+                  } else if (notification is ScrollEndNotification) {
+                    _onUserScrollEnd();
+                  }
+                  return false;
+                },
+                child: SingleChildScrollView(
+                  controller: _scrollController,
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Table(
+                    border: TableBorder.all(
+                        color: Colors.black, width: responsive.borderWidth(0.5)),
+                    columnWidths: columnWidths,
+                    children: warehouseList
+                        .map((data) => _buildDataRow(
+                              data.buyer ?? 'N/A',
+                              data.total3Years ?? 0,
+                              data.year1 ?? 0,
+                              data.year2 ?? 0,
+                              data.year3 ?? 0,
+                            ))
+                        .toList(),
                   ),
                 ),
               ),
