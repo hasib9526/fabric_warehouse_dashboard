@@ -29,6 +29,5 @@ void main() async {
   // Enable wakelock to keep screen awake
   await WakelockPlus.enable();
   runApp(const FabricWarehouseDashboard());
-  Get.put(FabricWarehouseController());
 }
 

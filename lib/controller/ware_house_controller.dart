@@ -13,22 +13,23 @@ class FabricWarehouseController extends GetxController {
   var errorMessage = ''.obs;
   var hasConnectionError = false.obs;
 
-  // TAL
-    var companyId = '06'.obs;
+  // Company ID (set via initializeWithCompany after company selection)
+  var companyId = ''.obs;
 
-  // //BGL
-  // var companyId = '04'.obs;
-
-  @override
-  void onInit() {
-    super.onInit();
+  // Initialize with selected company and start data fetching
+  void initializeWithCompany(String id) {
+    companyId.value = id;
     fetchFabricWarehouseData(showLoading: true);
     fetchFabricWarehouseCapacity();
-
     Timer.periodic(Duration(minutes: 2), (timer) {
       fetchFabricWarehouseData();
       fetchFabricWarehouseCapacity();
     });
+  }
+
+  @override
+  void onInit() {
+    super.onInit();
   }
 
   Future<void> fetchFabricWarehouseData({bool showLoading = false}) async {

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'package:fabric_warehouse_dashboard/view/screens/company_selection_screen.dart';
 import 'package:fabric_warehouse_dashboard/view/widgets/bayer_wise_chart.dart';
 import 'package:fabric_warehouse_dashboard/view/widgets/desh_board_header.dart';
 import 'package:flutter/material.dart';
@@ -14,94 +15,102 @@ class FabricWarehouseDashboard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final responsive = context.responsive;
-    final FabricWarehouseController controller = Get.find<FabricWarehouseController>();
-
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Fabric Warehouse TV Dashboard',
       theme: ThemeData(primarySwatch: Colors.grey, fontFamily: 'Roboto'),
-      home: Scaffold(
-        backgroundColor: Colors.white,
-        body: Container(
-          decoration: BoxDecoration(
-            border: Border.all(color: Colors.black, width: responsive.borderWidth(2)),
-          ),
-          child: Column(
-            children: [
-              // Header
-              const DashboardHeader(),
-              Expanded(
-                child: Obx(() {
-                  // Show single loader for entire screen
-                  if (controller.isLoading.value) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  }
+      home: const CompanySelectionScreen(),
+    );
+  }
+}
 
-                  // Show error with retry button
-                  if (controller.errorMessage.value.isNotEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            'Error: ${controller.errorMessage.value}',
-                            style: TextStyle(fontSize: responsive.fontSize(20)),
-                          ),
-                          SizedBox(height: responsive.spacing(10)),
-                          ElevatedButton(
-                            onPressed: () => controller.fetchFabricWarehouseData(showLoading: true),
-                            child: Text('Retry'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
+class FabricDashboardScreen extends StatelessWidget {
+  const FabricDashboardScreen({super.key});
 
-                  // Show main content
-                  return Padding(
-                    padding: responsive.allPadding(10.0),
+  @override
+  Widget build(BuildContext context) {
+    final responsive = context.responsive;
+    final FabricWarehouseController controller = Get.find<FabricWarehouseController>();
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      body: Container(
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.black, width: responsive.borderWidth(2)),
+        ),
+        child: Column(
+          children: [
+            // Header
+            const DashboardHeader(),
+            Expanded(
+              child: Obx(() {
+                // Show single loader for entire screen
+                if (controller.isLoading.value) {
+                  return Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
+
+                // Show error with retry button
+                if (controller.errorMessage.value.isNotEmpty) {
+                  return Center(
                     child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Top Row -> Stats + BuyerDataTable
-                        Expanded(
-                          flex: 1,
-                          child: Row(
-                            children: [
-                              // StatsRow
-                              Expanded(flex: 1, child: StatsRow()),
-                              SizedBox(width: responsive.spacing(10)),
-                              // BuyerDataTable
-                              Expanded(flex: 1, child: BuyerDataTable()),
-                            ],
-                          ),
+                        Text(
+                          'Error: ${controller.errorMessage.value}',
+                          style: TextStyle(fontSize: responsive.fontSize(20)),
                         ),
-
-                        // const SizedBox(height: 10),
-                        SizedBox(height: responsive.height(10.8)),
-                        // Bottom Row -> Charts
-                        Expanded(
-                          flex: 1,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Expanded(child: CapacityChart()),
-                              SizedBox(width: responsive.spacing(16)),
-                              Expanded(child: StockAgingChart()),
-                              SizedBox(width: responsive.spacing(16)),
-                              Expanded(child: BuyerWiseChart()),
-                            ],
-                          ),
+                        SizedBox(height: responsive.spacing(10)),
+                        ElevatedButton(
+                          onPressed: () => controller.fetchFabricWarehouseData(showLoading: true),
+                          child: Text('Retry'),
                         ),
                       ],
                     ),
                   );
-                }),
-              ),
-            ],
-          ),
+                }
+
+                // Show main content
+                return Padding(
+                  padding: responsive.allPadding(10.0),
+                  child: Column(
+                    children: [
+                      // Top Row -> Stats + BuyerDataTable
+                      Expanded(
+                        flex: 1,
+                        child: Row(
+                          children: [
+                            // StatsRow
+                            Expanded(flex: 1, child: StatsRow()),
+                            SizedBox(width: responsive.spacing(10)),
+                            // BuyerDataTable
+                            Expanded(flex: 1, child: BuyerDataTable()),
+                          ],
+                        ),
+                      ),
+
+                      SizedBox(height: responsive.height(10.8)),
+                      // Bottom Row -> Charts
+                      Expanded(
+                        flex: 1,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(child: CapacityChart()),
+                            SizedBox(width: responsive.spacing(16)),
+                            Expanded(child: StockAgingChart()),
+                            SizedBox(width: responsive.spacing(16)),
+                            Expanded(child: BuyerWiseChart()),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }),
+            ),
+          ],
         ),
       ),
     );
