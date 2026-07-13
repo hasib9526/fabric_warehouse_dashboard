@@ -25,14 +25,21 @@ class _BuyerDataTableState extends State<BuyerDataTable> {
     // Set up timer for auto pagination
     _timer = Timer.periodic(const Duration(seconds: 20), (timer) {
       if (mounted && controller.fabricWarehouse.value.warehouseList != null) {
+        final totalPages =
+            ((controller.fabricWarehouse.value.warehouseList!.length) /
+                    _rowsPerPage)
+                .ceil();
+        final isLastPage = _currentPage >= (totalPages == 0 ? 1 : totalPages) - 1;
+
         setState(() {
-          final totalPages =
-          ((controller.fabricWarehouse.value.warehouseList!.length) /
-              _rowsPerPage)
-              .ceil();
           _currentPage =
               (_currentPage + 1) % (totalPages == 0 ? 1 : totalPages);
         });
+
+        // Notify cycle screen after showing the last page
+        if (isLastPage) {
+          controller.onLastPageReached?.call();
+        }
       }
     });
   }

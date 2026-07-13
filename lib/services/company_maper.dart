@@ -5,6 +5,8 @@ class CompanyMapper {
         return "BGL";
       case "06":
         return "TAL";
+      case "09":
+        return "RHL";
       default:
         return "Unknown";
     }

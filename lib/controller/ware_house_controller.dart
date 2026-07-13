@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
@@ -13,11 +14,15 @@ class FabricWarehouseController extends GetxController {
   var errorMessage = ''.obs;
   var hasConnectionError = false.obs;
 
+  // Set by CycleScreen; called by BuyerDataTable when the last page is shown
+  VoidCallback? onLastPageReached;
+
   // TAL
-    var companyId = '06'.obs;
+    //var companyId = '06'.obs;
 
   // //BGL
-  // var companyId = '04'.obs;
+  //var companyId = '04'.obs;
+  var companyId = '09'.obs;
 
   @override
   void onInit() {

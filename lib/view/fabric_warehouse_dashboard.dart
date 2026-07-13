@@ -17,11 +17,7 @@ class FabricWarehouseDashboard extends StatelessWidget {
     final responsive = context.responsive;
     final FabricWarehouseController controller = Get.find<FabricWarehouseController>();
 
-    return GetMaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Fabric Warehouse TV Dashboard',
-      theme: ThemeData(primarySwatch: Colors.grey, fontFamily: 'Roboto'),
-      home: Scaffold(
+    return Scaffold(
         backgroundColor: Colors.white,
         body: Container(
           decoration: BoxDecoration(
@@ -103,7 +99,6 @@ class FabricWarehouseDashboard extends StatelessWidget {
             ],
           ),
         ),
-      ),
     );
   }
 }
