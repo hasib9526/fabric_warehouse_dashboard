@@ -12,6 +12,7 @@ class CompanySelectionScreen extends StatelessWidget {
     final companies = [
       {'id': '04', 'name': 'BGL', 'color': const Color(0xFF1F618D)},
       {'id': '06', 'name': 'TAL', 'color': const Color(0xFF27AE60)},
+      {'id': '09', 'name': 'RHL', 'color': const Color(0xFF8E44AD)},
     ];
 
     return Scaffold(
@@ -62,7 +63,7 @@ class CompanySelectionScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: companies.asMap().entries.map((entry) {
                   return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 30),
+                    padding: EdgeInsets.symmetric(horizontal: 16),
                     child: _CompanyCard(
                       id: entry.value['id'] as String,
                       name: entry.value['name'] as String,
@@ -136,8 +137,8 @@ class _CompanyCardState extends State<_CompanyCard> {
           onTap: _onSelect,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 180),
-            width: 260,
-            height: 180,
+            width: 220,
+            height: 160,
             decoration: BoxDecoration(
               color: _highlighted
                   ? widget.color
